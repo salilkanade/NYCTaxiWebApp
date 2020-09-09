@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+
+    <meta charset="utf-8">
+
+    <!-- Ensures that IE and Edge uses the latest version and doesn't emulate an older version -->
+    <meta http-equiv="x-ua-compatible" content="IE=Edge">
+
+    <!-- Ensures the web page looks good on all screen sizes. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
+    <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" type="text/css">
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+    <script src="https://atlas.microsoft.com/sdk/javascript/service/2/atlas-service.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.7/signalr.min.js"></script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+        }
+
+        #myMap {
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+
+    <pre id='test'></pre>
+
+    <script>
+
+        var map, symbolLayer, popup, dataSource;
+
+        function init() {
+            map = new atlas.Map('myMap', {
+                center: [-73.9, 40.7],
+                zoom: 12,
+                language: 'en-US',
+                authOptions: {
+                    authType: 'subscriptionKey',
+                    subscriptionKey: 'D3hECx7iTHK_4BdZxeHst9NSCc62cUogCkn1b3yFmsY'
+                }
+            });
+
+            map.events.add('ready', function () {
+                //Create a data source and add it to the map.
+                dataSource = new atlas.source.DataSource();
+                map.sources.add(dataSource);
+
+                //Create a symbol layer to render icons and/or text at points on the map.
+                // var symbolLayer = new atlas.layer.SymbolLayer(dataSource);
+
+                //Add a layer for rendering the route lines and have it render under the map labels.
+                map.layers.add(new atlas.layer.LineLayer(dataSource, null, {
+                    strokeColor: '#2272B9',
+                    strokeWidth: 5,
+                    lineJoin: 'round',
+                    lineCap: 'round'
+                }), 'labels');
+
+                map.controls.add([
+                    new atlas.control.ZoomControl(),
+                    new atlas.control.CompassControl(),
+                    new atlas.control.PitchControl(),
+                    new atlas.control.StyleControl()
+                ], {
+                    position: "top-right"
+                });
+
+
+                //Add the layer to the map.
+                // map.layers.add(layer);
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl('https://taxidemosalil.azurewebsites.net/api')
+                    .withAutomaticReconnect()
+                    .build()
+
+                connection.on('notify', (msg) => {
+                    const data = JSON.parse(msg)
+                    const pre = document.getElementById('test')
+                    for (const d of data) {
+                        console.log(d)
+
+                        //Create the GeoJSON objects which represent the start and end points of the route.
+                        var startPoint = new atlas.data.Feature(new atlas.data.Point([d.pickupLon, d.pickupLat]), {
+                            tripDistanceInMiles: d.tripDistanceInMiles,
+                            passengerCount: d.passengerCount,
+                            icon: "pin-round-blue"
+                        });
+
+                        var endPoint = new atlas.data.Feature(new atlas.data.Point([d.dropoffLon, d.dropoffLat]), {
+                            tripDistanceInMiles: d.tripDistanceInMiles,
+                            passengerCount: d.passengerCount,
+                            icon: "pin-round-red"
+                        });
+
+                        //Add the data to the data source.
+                        dataSource.add([startPoint, endPoint]);
+
+                        // Use SubscriptionKeyCredential with a subscription key
+                        var subscriptionKeyCredential = new atlas.service.SubscriptionKeyCredential(atlas.getSubscriptionKey());
+
+                        // Use subscriptionKeyCredential to create a pipeline
+                        var pipeline = atlas.service.MapsURL.newPipeline(subscriptionKeyCredential);
+
+                        // Construct the RouteURL object
+                        var routeURL = new atlas.service.RouteURL(pipeline);
+
+                        //Start and end point input to the routeURL
+                        var coordinates = [[startPoint.geometry.coordinates[0], startPoint.geometry.coordinates[1]], [endPoint.geometry.coordinates[0], endPoint.geometry.coordinates[1]]];
+
+                        //Make a search route request
+                        routeURL.calculateRouteDirections(atlas.service.Aborter.timeout(10000), coordinates).then((directions) => {
+                            //Get data features from response
+                            var data = directions.geojson.getFeatures();
+                            dataSource.add(data);
+                        });
+
+                        if (dataSource.getShapes().length > 48) {
+                            dataSource.remove(dataSource.getShapes().slice(0, 3));
+                        }
+
+                    }
+                })
+                connection.start();
+
+                //Add a layer for rendering point data as symbols.
+                symbolLayer = new atlas.layer.SymbolLayer(dataSource, null, { iconOptions: { allowOverlap: true } });
+                map.layers.add(symbolLayer);
+
+                //Create a popup but leave it closed so we can update it and display it later.
+                popup = new atlas.Popup({
+                    position: [0, 0],
+                    pixelOffset: [0, -18]
+                });
+
+                //Close the popup when the mouse moves on the map.
+                map.events.add('mousemove', closePopup);
+
+                /**
+                 * Open the popup on mouse move or touchstart on the symbol layer.
+                 * Mouse move is used as mouseover only fires when the mouse initially goes over a symbol. 
+                 * If two symbols overlap, moving the mouse from one to the other won't trigger the event for the new shape as the mouse is still over the layer.
+                 */
+                map.events.add('mousemove', symbolLayer, symbolHovered);
+                map.events.add('touchstart', symbolLayer, symbolHovered);
+            })
+        }
+        function closePopup() {
+            popup.close();
+        }
+
+        function symbolHovered(e) {
+            //Make sure the event occurred on a shape feature.
+            if (e.shapes && e.shapes.length > 0) {
+                var properties = e.shapes[0].getProperties();
+
+                //Update the content and position of the popup.
+                popup.setOptions({
+                    //Create the content of the popup.
+                    content: `<div style="padding:10px;"> 'Trip Distance: ${properties.tripDistanceInMiles} Miles'<br/> 'Passenger Count: ${properties.passengerCount}' </div>`,
+                    position: e.shapes[0].getCoordinates(),
+                    pixelOffset: [0, -18]
+                });
+                //Open the popup.
+                popup.open(map);
+            }
+        }
+    </script>
+</head>
+
+<body onload="init()">
+    <div id="myMap"></div>
+</body>
+
+</html>

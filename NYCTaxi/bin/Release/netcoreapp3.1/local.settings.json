@@ -1,0 +1,12 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=storageaccountsalil8457;AccountKey=6PWJnBxX5jG8ho+/B8j0zQWqbAS5KuLaOSusFgehwmLypgJR/1RTc4I76BZOKdtX8syen/lPQ1quZ3uu+ihd0g==;BlobEndpoint=https://storageaccountsalil8457.blob.core.windows.net/;TableEndpoint=https://storageaccountsalil8457.table.core.windows.net/;QueueEndpoint=https://storageaccountsalil8457.queue.core.windows.net/;FileEndpoint=https://storageaccountsalil8457.file.core.windows.net/",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "AzureSignalRConnectionString": "Endpoint=https://taxiny.service.signalr.net;AccessKey=uKREfRAHwG8pujC+k8cgtAbnS/6/QjNAwWi+whaqkEo=;Version=1.0;"
+  },
+  "Host": {
+      "CORS": "http://localhost:8080",
+      "CORSCredentials": true
+  }
+}
