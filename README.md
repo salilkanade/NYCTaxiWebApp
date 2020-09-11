@@ -560,7 +560,7 @@ function symbolHovered(e) {
 - Type in `index.html` into the **Index document name** 
 - Finally, click on **Storage Explorer (preview)**. Under *Blob Containers*, there should be a `$web` in the dropdown. Click on that and verify that the `index.html` file listed is the correct one.
 
-#### Thats everything wired up!
+#### That's everything wired up!
 You should now be able to run your Azure Function App, open your web app in a browser and after a couple seconds, see your taxi data rendered on the map. Open up the console to view trace logs if you want to inspect the taxi data objects. 
 
 
