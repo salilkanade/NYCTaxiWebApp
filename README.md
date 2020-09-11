@@ -152,12 +152,8 @@ In order to use the Cosmos DB change feed to track changes to the flight data, w
 ## HTTP Trigger Function
 
 1. Open up **Visual Studio Code** and create a new **New File**.
-
-2. Make sure you have Azure Functions v2 selected and search for the Timer trigger function template.
-
-3. Copy and paste the code below into your new file. There are two functions, one called negoitate which establishes the connection with the SignalR hub and another called message which relays the records from the Stream Analytics job to the SignalR hub.
-
-4. Make sure the code is editted to include your specific SignalR hub name. 
+2. Copy and paste the code below into your new file. There is a function called message which relays the records from the Stream Analytics job to the SignalR hub.
+3. Make sure the code is editted to include your specific SignalR hub name. 
 
 ```CSharp
 using System.IO;
@@ -171,19 +167,6 @@ using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 
 namespace HTTPTrigger
 {   
-    public static class NegotiateFunction
-    {
-        [FunctionName("negotiate")]
-        public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous)] HttpRequest req,
-                                        [SignalRConnectionInfo(HubName = "<Insert Hub Name here>")] SignalRConnectionInfo info,
-                                        ILogger log)
-        {
-            return info != null
-                ? (ActionResult)new OkObjectResult(info)
-                : new NotFoundObjectResult("Failed to load SignalR Info.");
-        }
-    }
-
     public static class MessageFunction
     {
         [FunctionName("message")]
@@ -213,7 +196,7 @@ namespace HTTPTrigger
 
 To use the SignalR binding extensions you need to add the [Microsoft.Azure.WebJobs.Extensions.SignalRService](https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.SignalRService) package from nuget as a dependency to your project.
 
-5. Add an app setting to the **local.settings.json** file called `AzureSignalRConnectionString` and set the value to the connection string for SignalR service.
+4. Add an app setting to the **local.settings.json** file called `AzureSignalRConnectionString` and set the value to the connection string for SignalR service.
 
 The next thing to do is to create a mechanism to push the taxi data to our SignalR Service that we provisioned earlier. Lets cover that next.
 
@@ -556,7 +539,8 @@ connection.on('notify', (msg) => {
 connection.start();
 ```
 
-3. Now that the connection is established, we need to add a symbol layer and some events to display useful information about the record. Add the following snippet also inside of the `init()` function 
+3. Now that the connection is established, we need to add a symbol layer and some events to display useful information about the record. Add the following snippet also inside of the `init()` function.
+
 ```javascript
 //Add a layer for rendering point data as symbols.
 symbolLayer = new atlas.layer.SymbolLayer(dataSource, null, { iconOptions: { allowOverlap: true } });
@@ -579,58 +563,41 @@ map.events.add('mousemove', closePopup);
 map.events.add('mousemove', symbolLayer, symbolHovered);
 map.events.add('touchstart', symbolLayer, symbolHovered);
 ```
+4. Next, we need to add create two functions for the popups on each pin to display the taxi ride information.
 
-    The `ProcessFlightData(flight)` method will be called each time the SignalR connection receives an update from the **flightdata** hub. At which point we create a new **shape** for the map to reflect the new properties, add the shape to the collection of planes in local memory and update the maps **datasource** with the update plane collection values.
+```
+function closePopup() {
+    popup.close();
+}
 
-4. Remove the call to `GetFlightData()` from the `GetMap()` function as we now handle this in the `ProcessFlightData(flight)` method we just created.
+function symbolHovered(e) {
+    //Make sure the event occurred on a shape feature.
+    if (e.shapes && e.shapes.length > 0) {
+        var properties = e.shapes[0].getProperties();
 
-5. Where the datasource is initialized, remove the `var` tag so that it gets set to the local variable we also just created.  
-
-6. The final step is to initialize the **SiganlR** connection and tell the signalr.js client which method to invoke on our web app each time it receives updates.
-
-    - Add the following code snippet to the Map **ready** event so that the connection gets created once the map has been loaded.
-    - This logic makes a request to the `GetConnectionInfo` method to get the url and access token of the SignalR service.
-    - Once a token has been acquired, create a new connection using the `SignalR.HubConnectionBuilder` method, passing in the url and access token as options.
-    - Start the connection and once connected, each time a new message appears in the **newFlightData** hub, make a call to the `ProcessFlightData(flight)` method.
-    - If the connection gets lost, retry starting the connection after a couple of seconds
-
-```javascript
-GetConnectionInfo().then(function (info) {
-    let accessToken = info.accessToken
-    const options = {
-        accessTokenFactory: function () {
-            if (accessToken) {
-                const _accessToken = accessToken
-                accessToken = null
-                return _accessToken
-            } else {
-                return GetConnectionInfo().then(function (info) {
-                    return info.accessToken
-                })
-            }
-        }
+        //Update the content and position of the popup.
+        popup.setOptions({
+            //Create the content of the popup.
+            content: `<div style="padding:10px;"> 'Trip Distance: ${properties.tripDistanceInMiles} Miles'<br/> 'Passenger Count: ${properties.passengerCount}' </div>`,
+            position: e.shapes[0].getCoordinates(),
+            pixelOffset: [0, -18]
+        });
+        //Open the popup.
+        popup.open(map);
     }
-
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl(info.url, options)
-        .build()
-
-    StartConnection(connection)
-
-    connection.on('newFlightData', ProcessFlightData)
-
-    connection.onclose(function () {
-        console.log('disconnected')
-        setTimeout(function () { StartConnection(connection) }, 5000)
-    })           
-}).catch(console.error)
+}
 ```
 
+5. The final step now is to save your update `index.html` file. Once that has been completed, head over to your storage account in the Azure online portal. 
+
+- Click on **Static Website** on the side tab, and click **Enable**. 
+- Type in `index.html` into the **Index document name** 
+- Finally, click on **Storage Explorer (preview)**. Under *Blob Containers*, there should be a `$web` in the dropdown. Click on that and verify that the `index.html` file listed is the correct one.
+
 #### Thats everything wired up!
-You should now be able to run your Azure Function App, open your web app in a browser and after a couple seconds, see some flights rendered on the map. Open up the console to view trace logs if you want to inspect the flight data objects. 
+You should now be able to run your Azure Function App, open your web app in a browser and after a couple seconds, see your taxi data rendered on the map. Open up the console to view trace logs if you want to inspect the flight data objects. 
 
-![RTFLM](Artifacts/RealTimeFlightMap.gif)
 
-Obviously this is only just scratching the surface of what we could do with this particular example or even with other use cases for real time web apps using Azure Functions, CosmosDB and SignalR. I hope you enjoyed this exercise as much as I did putting it together.
+Obviously this is only just scratching the surface of what we could do with this particular example or even with other use cases for real time serverless web apps using Azure Functions, Stream Analytics and SignalR. I hope you enjoyed this tutorial as much as I did putting it together.
 
 Thank You!
