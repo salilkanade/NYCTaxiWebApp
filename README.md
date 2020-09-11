@@ -11,7 +11,7 @@ In this tutorial, we will be visualizing data on a serverless web app utilizing 
 - Finally the web app will be configured with a SignalR client to handle the data changes in real-time.
 
 For an introduction to the architecture, familiarize yourself with the picture below. 
-![DemoArch](https://docs.microsoft.com/en-us/azure/stream-analytics/media/stream-analytics-solution-patterns/dynamic-app.png)
+<img width="645" alt="DemoArch" src="https://user-images.githubusercontent.com/68666863/92974360-de1dd900-f43a-11ea-88ec-01b6b62e5b96.PNG">
 
 ## What you will need
 
