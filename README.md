@@ -113,7 +113,22 @@ In this tutorial, we will be visualizing data on a serverless web app utilizing 
 
 ---
 
-# Part 1 - Creating the Virtual Machine and Event Hub for data ingestion
+# Part 1 - Creating the Virtual Machine, Event Hub, and Stream Analytics job for data ingestion
+
+## Create the VM from the provisioned image
+
+## Set up the Event Hub to gather records from the Virtual Machine
+
+## Set up the Stream Analytics job to query and process the data
+1. Head over to your Stream Analytics job that we created in the first step within the Azure portal.
+2. Click **Inputs** under the Job topology section.
+3. Next, click **Add Stream Input** and select **Event Hub**
+4. Name the input alias as **TaxiRide** and fill out the rest of the information to link up with the Event Hub created right before.
+5. Next, click **Save** and once the connection is successful, click **Outputs** under the Job topology section in the left-hand menu bar.
+6. In the **Ouputs** tab, click **Add** and select **Azure Function** from the dropdown menu.
+7. Name the output alias as **ASAFunction** and select the **Provide azure function settings manually**
+8. Provide the correct subscription where the function app was created, and provide the correct function app name.
+9. Under the **Function** query box, type **message** and provide the appropriate key from the Function App. 
 
 ---
 
@@ -203,9 +218,9 @@ namespace HTTPTrigger
 
 If you run your function app now, you should get both your negotiate and message functions spinning up at the same time. If everything is hooked up correctly you should see some log output to the console like below showing how many flights were added into the database and subsequently processed by the change feed.
     
-5. The next step to add the SignalR output binding. To use this binding you will need add the **Microsoft.Azure.WebJobs.Extensions.SignalRService** package dependency from nuget to your project.
+1. The next step to add the SignalR output binding. To use this binding you will need add the **Microsoft.Azure.WebJobs.Extensions.SignalRService** package dependency from nuget to your project.
 
-6. With the package installed add the binding to your function as per below, setting the **HubName** attribute to your specific SignalR hub name.
+2. With the package installed add the binding to your function as per below, setting the **HubName** attribute to your specific SignalR hub name.
 
     - The **Target** property is the name of the function to be invoked on the client and the **Arguments** property is the array of objects to be passed to the client.
 
@@ -253,7 +268,7 @@ namespace HTTPTrigger
 
 }
 ```
-7. The final thing to do before we run this function is to add the connection string for the SignalR Service to the functions config.
+3. The final thing to do before we run this function is to add the connection string for the SignalR Service to the functions config.
 
     - Create a new setting property called `"AzureSignalRConnectionString"` and set the value to the connection string for your SignalR instance in Azure.
 
@@ -261,7 +276,7 @@ Once thats done, your functions are all set to go. Let's spin these functions up
 
 Run your Function App again and make a request to your **SignalRConnectionInfo** endpoint. You should see a service endpoint url which matches your deployed SignalR service in Azure and an access token for that service. 
 
-8. The final thing to do for local development only is to set the **CORS** settings for your function app. This is done because locally your functions will be running on localhost but your web app is simply being served up from the file system. Add the following code snippet to your `local.settings.json` file to enable cross origin requests.
+4. The final thing to do for local development only is to set the **CORS** settings for your function app. This is done because locally your functions will be running on localhost but your web app is simply being served up from the file system. Add the following code snippet to your `local.settings.json` file to enable cross origin requests.
 
 ```json
   "Host": {
@@ -412,6 +427,8 @@ Refresh your browser... you should now see controls in the top right corner of y
 ---
 
 # Part 4 - Connect the Web App to Azure SignalR
+
+In Part 4, we will now be adding some code to make the map interactive and functional.
 
 - Add the following script snippet to your `index.html` file to add the **signalR.js** dependencies to your web app.
 
