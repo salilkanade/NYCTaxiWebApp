@@ -1,4 +1,4 @@
-# Real Time Taxi Flight Visualization w/ Azure Stream Analytics, Azure Functions, and SignalR
+# Real-time Data Visualization w/ Azure Stream Analytics, Azure Functions, and SignalR
 
 ## What we will cover
 
