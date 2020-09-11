@@ -113,9 +113,13 @@ In this tutorial, we will be visualizing data on a serverless web app utilizing 
 
 ---
 
+# Part 1 - Creating the Virtual Machine and Event Hub for data ingestion
+
+---
+
 # Part 2 - Building Azure Functions to enable real time flight data
 
-In Part 1 of the workshop we will now focus on building out the Azure Functions which will enable real time data updates for the flight data on our map.
+In Part 2 of this tutorial, we will now focus on building out the Azure Functions which will enable real time data updates for the flight data on our map.
 The following image describes the flow we are looking to create to enable real time functionality.
 
 1. A record or change is updated in the Event Hub. 
@@ -127,28 +131,6 @@ The following image describes the flow we are looking to create to enable real t
 
 [Take a look at the docs if you want to explore this pattern a little further](https://docs.microsoft.com/en-us/azure/azure-signalr/signalr-concept-azure-functions)
 
-## Create the Virtual Machine and the Event Hub
-
-In order to use the Cosmos DB change feed to track changes to the flight data, we are going to need to create a database and collection to store the information in the first place.  
-
-1. In the portal navigate to your Cosmos DB instance we created earlier and open up the **Data Explorer**.
-2. In the top left had corner, select **New Container** which will open up the **Add Container** dialog. Fill in the fields as per the table below.
-
-    | Name          | Value |
-    | ---           | ---   |
-    | Database id   | Select **Create new** and give your database a name. Tick the option to **Provision database throughput**
-    | Throughput    | Leave as the minimum of 400 RUs
-    | Container id  | Give your collection a meaningful name
-    | Partition Key | Set to /originCountry as this will be derived from our data set.
-
-    ![CC](Artifacts/CosmosContainer.png)
-
-3. Select **OK** and after a couple of seconds, you should have your new database and collection provisioned.
-
-4. (Optional) - Navigate to the **Settings** section of your new collection.
-    - Turn on **Time to live** and set the number of seconds a record should remain before being removed.
-    - I've enabled this and set it to 10 min as a quick 'hack' to clear out any stale flight data as that database will constantly be updated with new flight information.
-
 ## HTTP Trigger Function
 
 1. Open up **Visual Studio Code** and create a new **New File**.
@@ -156,7 +138,6 @@ In order to use the Cosmos DB change feed to track changes to the flight data, w
 3. Make sure the code is editted to include your specific SignalR hub name. 
 
 ```CSharp
-
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -188,7 +169,7 @@ The next thing to do is to create a mechanism to push the taxi data to our Signa
 
 ## SignalR Outbound Trigger
 
-In the same Azure Function, we will then use the [SignalR output binding](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-signalr-service#using-signalr-service-with-azure-functions) to push the updated flight data to SignalR. 
+In the same Azure Function namespace, we will then use the [SignalR output binding](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-signalr-service#using-signalr-service-with-azure-functions) to push the updated flight data to SignalR. 
 
 ```csharp
 namespace HTTPTrigger
@@ -224,39 +205,52 @@ If you run your function app now, you should get both your negotiate and message
     
 5. The next step to add the SignalR output binding. To use this binding you will need add the **Microsoft.Azure.WebJobs.Extensions.SignalRService** package dependency from nuget to your project.
 
-6. With the package installed add the binding to your function as per below, setting the **HubName** attribute to `flightdata`
+6. With the package installed add the binding to your function as per below, setting the **HubName** attribute to your specific SignalR hub name.
 
     - The **Target** property is the name of the function to be invoked on the client and the **Arguments** property is the array of objects to be passed to the client.
 
 Your function should now be complete and resemble the logic below.
 
 ```csharp
-public static class FlightDataChangeFeed
-{
-    [FunctionName("FlightDataChangeFeed")]
-    public static async Task RunAsync(
-        [CosmosDBTrigger(
-            databaseName: "flightsdb",
-            collectionName: "flights",
-            ConnectionStringSetting = "AzureCosmosDBConnection",
-            LeaseCollectionName = "leases",
-            CreateLeaseCollectionIfNotExists = true)]IReadOnlyList<Document> input,
-        [SignalR(HubName = "flightdata")] IAsyncCollector<SignalRMessage> signalRMessages,
-        ILogger log)
+namespace HTTPTrigger
+{   
+    public static class NegotiateFunction
     {
-        if (input != null && input.Count > 0)
+        [FunctionName("negotiate")]
+        public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous)] HttpRequest req,
+                                        [SignalRConnectionInfo(HubName = "taxidata")] SignalRConnectionInfo info,
+                                        ILogger log)
         {
-            log.LogInformation("Documents modified " + input.Count);
-            foreach (var flight in input)
-            {
-                await signalRMessages.AddAsync(new SignalRMessage
-                {
-                    Target = "newFlightData",
-                    Arguments = new[] { flight }
-                });
-            }
+            return info != null
+                ? (ActionResult)new OkObjectResult(info)
+                : new NotFoundObjectResult("Failed to load SignalR Info.");
         }
     }
+
+    public static class MessageFunction
+    {
+        [FunctionName("message")]
+        public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function)] HttpRequest req,
+                                                    [SignalR(HubName = "taxidata")] IAsyncCollector<SignalRMessage> signalRMessages,
+                                                    ILogger log)
+        {
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            log.LogInformation($"Request {requestBody}");
+            if (string.IsNullOrEmpty(requestBody))
+            {
+                return new BadRequestObjectResult("Please pass a payload to broadcast in the request body.");
+            }
+
+            await signalRMessages.AddAsync(new SignalRMessage()
+            {
+                Target = "notify",
+                Arguments = new object[] { requestBody }
+            });
+
+            return new OkResult();
+        }
+    }
+
 }
 ```
 7. The final thing to do before we run this function is to add the connection string for the SignalR Service to the functions config.
@@ -265,38 +259,14 @@ public static class FlightDataChangeFeed
 
 Once thats done, your functions are all set to go. Let's spin these functions up once again and test out the changes. With the functions running, head on over back the SignalR service in Azure and have a look at the metrics tab. After a couple of minutes you should see some telemetry start to feed through. It can take up to 10-15 minutes before you see data coming through on the metrics blade.
 
-## SignalR Connection Info 
-
-We have one more function to create before we can update the front end to connect to SignalR and that is the [Connection info input binding](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-signalr-service#signalr-connection-info-input-binding) which provides the client a valid token and the service endpoint for communicating with the SignalR service instance. 
-
-1. Once again in **Visual Studio 2017** project, right click and add a new **Azure Function** and call it **SignalRInfo**
-
-2. Pick the HttpTrigger template which should scaffold out a vanilla Http Triggered function
-
-    ![FSR](Artifacts/FuncSignalRInfo.png)
-
-3. Replace the contents of the function with the one below and update the **HubName** property to match the HubName you set in SignalR output binding in the previous function. By convention, the name of the function should be **negotiate** but you can set it to whatever you want.
-
-```csharp
-[FunctionName("negotiate")]
-public static IActionResult Run(
-    [HttpTrigger(AuthorizationLevel.Function)] HttpRequest req,
-    [SignalRConnectionInfo(HubName = "flightdata")] SignalRConnectionInfo connectionInfo,
-    ILogger log)
-{
-    return new OkObjectResult(connectionInfo);
-}
-```
 Run your Function App again and make a request to your **SignalRConnectionInfo** endpoint. You should see a service endpoint url which matches your deployed SignalR service in Azure and an access token for that service. 
 
-![FN](Artifacts/FuncNegotiate.png)
-
-4. The final thing to do for local development only is to set the **CORS** settings for your function app. This is done because locally your functions will be running on localhost but your web app is simply being served up from the file system. Add the following code snippet to your `local.settings.json` file to enable cross origin requests.
+8. The final thing to do for local development only is to set the **CORS** settings for your function app. This is done because locally your functions will be running on localhost but your web app is simply being served up from the file system. Add the following code snippet to your `local.settings.json` file to enable cross origin requests.
 
 ```json
   "Host": {
-    "LocalHttpPort": 7071,
-    "CORS": "*"
+    "CORS": "http://localhost:8000"
+    "CORSCredentials": true
   }
 ```
 
@@ -441,7 +411,7 @@ Refresh your browser... you should now see controls in the top right corner of y
 
 ---
 
-# Part 3 - Connect the Web App to Azure SignalR
+# Part 4 - Connect the Web App to Azure SignalR
 
 - Add the following script snippet to your `index.html` file to add the **signalR.js** dependencies to your web app.
 
