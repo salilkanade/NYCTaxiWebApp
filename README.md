@@ -5,7 +5,7 @@
 In this tutorial, we will be visualizing data on a serverless web app utilizing several Azure technologies.
 
 - We will be using Azure Maps to draw the map canvas in our web app.
-- To get the flight information, we will create a Virtual Machine from the provisioned image. The flight data will then be persisted in an Event Hub.
+- To get the flight information, we will create a Virtual Machine from the provisioned image. The taxi data will then be persisted in an Event Hub.
 - The Stream Analytics job will then process and query the data recieved from the Event Hub.
 - We will then create an Azure Function that listens to the Stream Analytics job and updates an Azure SignalR hub with all changes to the taxi data. 
 - Finally the web app will be configured with a SignalR client to handle the data changes in real-time.
