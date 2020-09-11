@@ -24,12 +24,9 @@ In this tutorial, we will be visualizing data on a serverless web app utilizing 
 
 ### Create a new Azure Maps resource
 
-1. In the upper left corner of the portal, click on ![CNR](Artifacts/CreateNewResource.png)
+1. In the upper left corner of the portal, click on **Create a resource***
 2. Type in **Maps** in the search bar and select **Maps** in the dropdown.
 3. Click the **Create** button that appears on the Maps resource page
-
-    ![NMR](Artifacts/NewMapsResource.png)
-
 4. Enter the following information into the **Create Maps Account** template
 
     | Name              | Value |
@@ -40,7 +37,6 @@ In this tutorial, we will be visualizing data on a serverless web app utilizing 
     | Pricing Tier      | Select **Standard S0** [See Pricing Info](https://azure.microsoft.com/en-us/pricing/details/azure-maps/)
 
 5. Read the **License and Privacy Statement** and select the checkbox.
-
 6. Once the new Azure Maps resource has been provision, navigate to the newly deployed resource and locate the **Authentication** tab under the **Settings** subheading. You will need to grab the key later on.
 
 ---
@@ -51,7 +47,7 @@ In this tutorial, we will be visualizing data on a serverless web app utilizing 
 
 ### Create a new Azure SignalR resource
 
-1. In the upper left corner of the portal, click on ![CNR](Artifacts/CreateNewResource.png)
+1. In the upper left corner of the portal, click on **Create a resource***
 2. Type in **SignalR** in the search bar and select **SignalR Service** in the dropdown.
 3. Click the **Create** button that appears on the SignalR Service resource page
 4. Enter the following information into the **Create SignalR Service** template
@@ -74,7 +70,7 @@ In this tutorial, we will be visualizing data on a serverless web app utilizing 
 
 ### Create a new Stream Analytics Job
 
-1. In the upper left corner of the portal, click on ![CNR](Artifacts/CreateNewResource.png)
+1. In the upper left corner of the portal, click on **Create a resource***
 2. Type in **Stream** in the search bar and select **Stream Analytics Job** in the dropdown.
 3. Click the **Create** button that appears on the Stream Analytics job page
 4. Enter the following information into the **Create Stream Analytics Job** template
@@ -85,221 +81,53 @@ In this tutorial, we will be visualizing data on a serverless web app utilizing 
     | Subscription      | Select your subscription
     | Resource Group    | Select the resource group created above
     | Location          | Select a location to deploy your Stream Analytics job too
-    | Hosting           | Cloud 
+    | Hosting           | Select **Cloud** hosting option 
    
 5. Click **Create** button that appears on the Stream Analytics job page
 
-# Part 1 - Creating a static Web App
+---
 
-The web app we are going to build is a simple flight tracker app. In part 1 of this session we are going to focus on creating a map of New Zealand that shows static flight data for all current flights over New Zealand air space.
+## Azure Function App
 
-## Create a new Map
+[**Azure Function App from the docs**](https://docs.microsoft.com/en-us/azure/azure-functions/functions-overview)
 
-1. Open up visual studio code and create a new project directory for this project.
-2. Create a new file called `index.html` 
-3. Copy the following boilerplate code and then we will fill rest.
+### Create a new Function App
 
-```html
-<!DOCTYPE html>
- <html>
- <head>
-     <title>Live Flight Data Map</title>
-     <meta charset="utf-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+1. In the upper left corner of the portal, click on **Create a resource***
+2. Type in **Function** in the search bar and select **Function App** in the dropdown.
+3. Click the **Create** button that appears on the Function App page
+4. Enter the following information into the **Create Function App** template
 
-     <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
-     <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" type="text/css">
-     <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+    | Name              | Value |
+    | ---               | ---   |
+    | Subscription      | Select your subscription
+    | Resource Group    | Select the resource group created above
+    | Function App name | Give your function app a meaningful name
+    | Publish           | Code
+    | Runtime stack     | Select **.NET Core** from the dropdown menu
+    | Version           | 3.1
+    | Region            | Select a region to deploy your function app too
+   
+5. Click **Review + Create** and then once the validation has passed, select **Create**
+6. Once the new Function App has been provision, navigate to the newly deployed resource and locate the **Keys** tab under the **Settings** subheading. You will need to grab the connection string later on.
 
-     <!-- Add a reference to the Azure Maps Services Module JavaScript file. -->
-     <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas-service.min.js"></script>
-
-     <script>
-     function GetMap(){
-         //Add Map Control JavaScript code here.
-     }
-     </script>
-
-     <style>
-         html,
-         body {
-             width: 100%;
-             height: 100%;
-             padding: 0;
-             margin: 0;
-         }
-
-         #myMap {
-             width: 100%;
-             height: 100%;
-         }
-     </style>
- </head>
- <body onload="GetMap()">
-     <div id="myMap"></div>
- </body>
- </html>
-```
-
-5. Go ahead and grab the subscription key for your Azure Maps account that you created earlier.
-6. Add the following javascript snippet to the `GetMap()` function and your subscription key to the placeholder.
-
-```javascript
-//Instantiate a map object
-var map = new atlas.Map("myMap", {
-    //Add your Azure Maps subscription key to the map SDK. Get an Azure Maps key at https://azure.com/maps
-    authOptions: {
-        authType: 'subscriptionKey',
-        subscriptionKey: '<Your Azure Maps Key>'
-    }
-});
-```
-
-7. Save your changes and open your `index.html` file in a browser. You should now see a really basic map of the world.
-
-![BM](Artifacts/BasicMap.png)
-
-## Customize your map
-
-To keep things simple and to ensure that this map of the world include New Zealand, we will scope the map to New Zealand specifically.
-Add the following options/settings to the `GetMap()` function, just below the `authOptions` section.
-
-```javascript
-style: "night",
-center: [171.7799, -40.838875],
-zoom: 6
-```
-
-Refresh the page in your browser and notice, the map is now zoomed in on New Zealand and we've made it dark! 
-You might need to tweak the **center coordinates** and **zoom** settings to get a better fit for your screen size and if you are after different styles or other custom configurations, take a look at the **Map** component section of the docs.
-
-- [Supported Styles](https://docs.microsoft.com/en-us/azure/azure-maps/supported-map-styles)
-- [Map Control Docs](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.map?view=azure-iot-typescript-latest)
-
-![BMNZ](Artifacts/BasicMapNZ.png)
-
-## Lets Add Some Flight Data!!
-
-Sweet map... but you said there would be planes! Adding the flight data to the map is going to require a couple of things so lets kick right into it.
-
-First we need to query the [OpenSky Network](https://opensky-network.org/apidoc/) API to get the flight data. The OpenSky Network provide open air traffic data for research and non-commercial purposes. They do provide more comprehensive licensing models should you need it but for the purposes of this workshop we will use the public endpoint.
-
-To simplify matters further and reduce the payload size, given we have scoped our map map to just New Zealand, the RESTful calls to the public API contain the boundary coordinates for New Zealand so that we only fetch flight data for flights on our map.
-
-In your browser or your favorite http client tool run the following GET request to the OpenSky Network API and familiarize yourself with the response body.
-
-- [GET Request](https://opensky-network.org/api/states/all?lamin=-50.00&lomin=160.00&lamax=-30.00&lomax=180.00) `https://opensky-network.org/api/states/all?lamin=-50.00&lomin=160.00&lamax=-30.00&lomax=180.00`
-
-Notice the **longitude** and **latitude** query params, these are just a rough estimate. Feel free to tweak these or make up your own all together. If you do change the location, don't forget to update your maps **center coordinates** we set in the previous step otherwise you won't see any flights in your region later on.
-
-In the interest of brevity, I've listed the fields we will be making use of below. For the full list, checkout the [OpenSky Network API Docs](https://opensky-network.org/apidoc/rest.html#response)
-
-| Index | Property          | Type      | Description
-| ---   | ---               | ---       | ---
-| 0     | icao24            | string    | Unique ICAO 24-bit address of the transponder in hex string representation.
-| 1     | callsign	        | string	| Callsign of the vehicle (8 chars). Can be null if no callsign has been received.
-| 2     | origin_country	| string	| Country name inferred from the ICAO 24-bit address.
-| 5     | longitude	        | float	    | WGS-84 longitude in decimal degrees. Can be null.
-| 6     | latitude	        | float	    | WGS-84 latitude in decimal degrees. Can be null.
-| 7     | baro_altitude 	| float	    | Barometric altitude in meters. Can be null.
-| 9     | velocity	        | float	    | Velocity over ground in m/s. Can be null.
-| 10    | true_track	    | float	    | True track in decimal degrees clockwise from north (north=0°). Can be null.
-
-In order to get the flight data, we will use the lightweight promis based HTTP client [Axios](https://github.com/axios/axios) to make a RESTful request to the OpenSky Network API with the request we just tested above. Add the following html script snippet to your `index.html` file to pull down the axios.js dependancies.
-
-```html
-    <!-- Promis based http client. https://github.com/axios/axios -->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-```
-
-Now add the following simple method below the `GetMap()` function to retrieve the flight data. With the function in place, it's time to render the flights on the map.
-
-```javascript
-function GetFlightData() {
-return axios.get('https://opensky-network.org/api/states/all?lamin=-50.00&lomin=160.00&lamax=-30.00&lomax=180.00')
-    .then(function (response) {
-        return response;
-    }).catch(console.error)
-}
-```
-
-Finally append the below code snippet to the `GetMap()`function. Here we are adding a ready event to the map so that this logic gets executed only after the map has been initialized.
-The snippet below does the following
-
-1. Add a image to use as the plane icon to the maps [ImageSprite](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.imagespritemanager?view=azure-iot-typescript-latest) collection. The `.png` referenced here is one that I created and is being served up from blob storage. Feel free to use this one or create your own graphics and get creative.
-
-2. The next step is to create a new [DataSource](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.source.datasource?view=azure-iot-typescript-latest) which will keep track of the flight data within the map.
-
-3. Next we create a new map [SymbolLayer](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.symbollayeroptions?view=azure-iot-typescript-latest) which describes how we want the flight data stored in the data source to be rendered on the map.
-
-    - In the `iconOptions` section we set the image to the plane icon we added to the ImageSprite later earlier on.
-    - We also set the **rotation** property of the icon using a function which fetches the value from the data source. This will be the **true_track** value in the flight data payload and "points" the icon in the same direction the flight is currently travelling.
-    - In the `textOptions` we add some flight information text which is also fetched from the data source for specific flight. This will render information about the flight next to the icon on the map.
-
-4. Finally make a call to the `GetFlightData()` function we created earlier and foreach flight in the response create a new map [Shape](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.shape?view=azure-iot-typescript-latest) and add it to the data source.
-
-    - The **Shape** contains a GeoJSON [Point](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.data.point?view=azure-iot-typescript-latest) object which will store the coordinates of a given flight.
-    - Then add some custom properties to the **Shape** to store the **Name, Altitude and Rotation** values of the flight which are used in the **SymbolLayer** above when rendering the flight information on the map.
-
-```javascript
-//Wait until the map resources are ready.
-map.events.add('ready', function () {
-
-    map.imageSprite.add('plane-icon', 'https://dtazfuncdemogsa.blob.core.windows.net/dt-azfuncdemo-blob/plane.png');
-
-    //Create a data source and add it to the map
-    var datasource = new atlas.source.DataSource();
-    map.sources.add(datasource);
-
-    //Create a symbol layer using the data source and add it to the map
-    map.layers.add(
-        new atlas.layer.SymbolLayer(datasource, null, {
-            iconOptions: {
-                ignorePlacement: true,
-                allowOverlap: true,
-                image: 'plane-icon',
-                size: 0.08,
-                rotation: ['get', 'rotation']
-            },
-            textOptions: {
-                textField: ['concat', ['to-string', ['get', 'name']], '- ', ['get', 'altitude']],
-                color: '#FFFFFF',
-                offset: [2, 0]
-            }
-        }));
-
-    GetFlightData().then(function (response) {
-        for (var flight of response.data.states) {
-            var pin = new atlas.Shape(new atlas.data.Point([flight[5], flight[6]]));
-            pin.addProperty('name', flight[1]);
-            pin.addProperty('altitude', flight[7]);
-            pin.addProperty('rotation', flight[10]);
-            datasource.add(pin);
-        }
-    });
-});
-```
-
-Refresh your browser... and TaDa!! You should now see static plane icons on your map representing the actual flights currently over New Zealand. 
-
-![BMFDNZ](Artifacts/BasicMapFlightDataNZ.png)
+---
 
 # Part 2 - Building Azure Functions to enable real time flight data
 
-In Part 2 of the workshop we will now focus on building out the Azure Functions which will enable real time data updates for the flight data on our map.
+In Part 1 of the workshop we will now focus on building out the Azure Functions which will enable real time data updates for the flight data on our map.
 The following image describes the flow we are looking to create to enable real time functionality.
 
-![BEF](Artifacts/BackEndFlow.png)
-
-1. A change is made in a Cosmos DB collection
-2. The change event is propagated to the Cosmos DB change feed
-3. An Azure Functions is triggered by the change event using the Cosmos DB trigger
+1. A record or change is updated in the Event Hub. 
+2. The updated record is propogated to the Stream Analytics job
+3. The record is processed and outputted from the Stream Analytics job to the Azure Function
+3. An Azure Functions is triggered by the change event using an HTTP trigger
 4. The SignalR Service output binding publishes a message to SignalR Service
 5. SignalR Service publishes the message to all connected clients
 
 [Take a look at the docs if you want to explore this pattern a little further](https://docs.microsoft.com/en-us/azure/azure-signalr/signalr-concept-azure-functions)
 
-## Create the Cosmos DB & Collection
+## Create the Virtual Machine and the Event Hub
 
 In order to use the Cosmos DB change feed to track changes to the flight data, we are going to need to create a database and collection to store the information in the first place.  
 
@@ -321,83 +149,73 @@ In order to use the Cosmos DB change feed to track changes to the flight data, w
     - Turn on **Time to live** and set the number of seconds a record should remain before being removed.
     - I've enabled this and set it to 10 min as a quick 'hack' to clear out any stale flight data as that database will constantly be updated with new flight information.
 
-## Timer Triggered Function
+## HTTP Trigger Function
 
-In order to get updated flight data we need a mechanism to poll the OpenSky Network APIs for changes. Azure Functions offer [several binding types](https://docs.microsoft.com/en-us/azure/azure-functions/functions-triggers-bindings#supported-bindings), one of which is a Timer Trigger. Timer triggers let you schedule function execution based on a [CRON expression](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-timer#cron-expressions).
-
-1. Open up **Visual Studio 2017** and create a new **Azure Functions** project / solution.
-
-    ![VSNP](Artifacts/VSNewProj.png)
+1. Open up **Visual Studio Code** and create a new **New File**.
 
 2. Make sure you have Azure Functions v2 selected and search for the Timer trigger function template.
 
-    ![FTT](Artifacts/FuncTimerTrigger.png)
+3. Copy and paste the code below into your new file. There are two functions, one called negoitate which establishes the connection with the SignalR hub and another called message which relays the records from the Stream Analytics job to the SignalR hub.
 
-You should now have a scaffolded Timer Triggered Azure Function that looks something like this. Rename your function to something more meaningful like FlightDataTimerPoll. 
-
-- Tweak the timer schedule to something more frequent than 5 minutes so that you get updates more often to your flight data. Here I've opted for 5 seconds so that I can see the planes move on my map later on. 
+4. Make sure the code is editted to include your specific SignalR hub name. 
 
 ```CSharp
-public static class FlightDataPoll
-{
-    [FunctionName("FlightDataPoll")]
-    public static void Run([TimerTrigger("*/5 * * * * *")]TimerInfo myTimer
-    ILogger log)
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.Azure.WebJobs.Extensions.SignalRService;
+
+namespace HTTPTrigger
+{   
+    public static class NegotiateFunction
     {
-        log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-    }
-}
-```
-
-The next task is to write the logic to fetch the flight data from the OpenSky API and store it in our database. To do this we are going to make use of the [Cosmos DB Output Binding](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-cosmosdb-v2#output).
-
-To use the Cosmos DB binding extensions you need to add the [Microsoft.Azure.WebJobs.Extensions.CosmosDB](https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.CosmosDB) package from nuget as a dependency to your project.
-
-1. Copy the `Flight.cs` class from the example source code into your project. This class contains some logic for mapping the API response from OpenSky Network so that we can deserialize the response to a C# object. This is not an important implementation detail for this workshop but make a note that we are setting the **id** field to the **icao24** property for simplicity later on.
-
-2. Add the CosmosDB output binding to your function parameters and add the database & collection names to the ones you just created before.
-
-3. Add an app setting to the **local.settings.json** file called `AzureCosmosDBConnection` and set the value to the connection string for your Cosmos DB instance.
-
-4. Make an http request to the same OpenSky Network API endpoint that we used in Part 1. 
-
-5. Deserialize the response into the `Flight.cs` data model and add it to the collection of output documents to be persisted in Cosmos DB. 
-
-Your function should end up looking something like below. Notice that the output binding is of type `IAsyncCollector<Flight>` which represents the shape of our Cosmos DB documents.
-
-```csharp
-public static class FlightDataPoll
-{
-    static HttpClient client = new HttpClient();
-
-    [FunctionName("FlightDataPoll")]
-    public static async Task RunAsync(
-        [TimerTrigger("*/5 * * * * *")]TimerInfo myTimer,
-        [CosmosDB(
-            databaseName: "flightsdb",
-            collectionName: "flights",
-            ConnectionStringSetting = "AzureCosmosDBConnection")]IAsyncCollector<Flight> documents,
-         ILogger log)
-    {
-        log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-
-         var openSkyUrl = "https://opensky-network.org/api/states/all?lamin=-50.00&lomin=160.00&lamax=-30.00&lomax=180.00";
-
-        using (HttpResponseMessage res = await client.GetAsync(openSkyUrl))
-        using (HttpContent content = res.Content)
+        [FunctionName("negotiate")]
+        public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous)] HttpRequest req,
+                                        [SignalRConnectionInfo(HubName = "<Insert Hub Name here>")] SignalRConnectionInfo info,
+                                        ILogger log)
         {
-            var result = JsonConvert.DeserializeObject<Rootobject>(await content.ReadAsStringAsync());
-            foreach (var item in result.states) {
-                await documents.AddAsync(Flight.CreateFromData(item));
-            }
-
-            log.LogInformation($"Total flights processed{result.states.Length}");
+            return info != null
+                ? (ActionResult)new OkObjectResult(info)
+                : new NotFoundObjectResult("Failed to load SignalR Info.");
         }
     }
+
+    public static class MessageFunction
+    {
+        [FunctionName("message")]
+        public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function)] HttpRequest req,
+                                                    [SignalR(HubName = "<Insert Hub Name here>")] IAsyncCollector<SignalRMessage> signalRMessages,
+                                                    ILogger log)
+        {
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            log.LogInformation($"Request {requestBody}");
+            if (string.IsNullOrEmpty(requestBody))
+            {
+                return new BadRequestObjectResult("Please pass a payload to broadcast in the request body.");
+            }
+
+            await signalRMessages.AddAsync(new SignalRMessage()
+            {
+                Target = "notify",
+                Arguments = new object[] { requestBody }
+            });
+
+            return new OkResult();
+        }
+    }
+
 }
 ```
 
-Run the function and head on over to the Data Explorer in the Cosmos DB portal. You should start to see documents containing flight data being added to the collection. The next thing to do is to create a mechanism to push the flight data to our SignalR Service that we provisioned earlier. Lets cover that next.
+To use the SignalR binding extensions you need to add the [Microsoft.Azure.WebJobs.Extensions.SignalRService](https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.SignalRService) package from nuget as a dependency to your project.
+
+5. Add an app setting to the **local.settings.json** file called `AzureSignalRConnectionString` and set the value to the connection string for SignalR service.
+
+The next thing to do is to create a mechanism to push the taxi data to our SignalR Service that we provisioned earlier. Lets cover that next.
 
 ## CosmosDB Change Feed & SignalR Outbound Trigger
 
@@ -526,64 +344,241 @@ Run your Function App again and make a request to your **SignalRConnectionInfo**
 
 With that done, we are now ready update the client app to connect to SignalR and start receiving real time updates to the flight data on the front end.
 
+---
+
+# Part 3 - Creating a static Web App
+
+The web app we are going to build displays the "real-time" data on an Azure Map interface. In Part 3 of this tutorial, we will be setting up the map so that the data can be  displayed. 
+
+## Create a new Map
+
+1. Open up visual studio code and create a new project directory for this project.
+2. Create a new file called `index.html` 
+3. Copy the following boilerplate code and then we will fill rest.
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+
+    <meta charset="utf-8">
+
+    <!-- Ensures that IE and Edge uses the latest version and doesn't emulate an older version -->
+    <meta http-equiv="x-ua-compatible" content="IE=Edge">
+
+    <!-- Ensures the web page looks good on all screen sizes. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
+    <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" type="text/css">
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+    <script src="https://atlas.microsoft.com/sdk/javascript/service/2/atlas-service.min.js"></script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+        }
+
+        #myMap {
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+
+    <pre id='test'></pre>
+
+    <script>
+
+        var map, symbolLayer, popup, dataSource;
+
+     function init() {
+         //Add Map Control JavaScript code here.
+     }
+     </script>
+
+</head>
+<body onload="init()">
+    <div id="myMap"></div>
+</body>
+</html>
+```
+
+5. Go ahead and grab the subscription key for your Azure Maps account that you created earlier.
+6. Add the following javascript snippet to the `GetMap()` function and your subscription key to the placeholder.
+
+```javascript
+//Instantiate a map object
+map = new atlas.Map("myMap", {
+    //Add your Azure Maps subscription key to the map SDK. Get an Azure Maps key at https://azure.com/maps
+    authOptions: {
+        authType: 'subscriptionKey',
+        subscriptionKey: '<Your Azure Maps Key>'
+    }
+});
+```
+
+7. Save your changes and open your `index.html` file in a browser. You should now see a really basic map of the world.
+
+## Customize your map
+
+To keep things simple and to ensure that this map of the world include New York, we will scope the map to New York specifically.
+Add the following options/settings to the `init()` function, just below the `authOptions` section.
+
+```javascript
+center: [-73.9, 40.7],
+zoom: 12
+```
+
+Refresh the page in your browser and notice, the map is now zoomed in on New York.
+
+You might need to tweak the **center coordinates** and **zoom** settings to get a better fit for your screen size and if you are after different styles or other custom configurations, take a look at the **Map** component section of the docs.
+
+- [Supported Styles](https://docs.microsoft.com/en-us/azure/azure-maps/supported-map-styles)
+- [Map Control Docs](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.map?view=azure-iot-typescript-latest)
+
+## Lets Add Some Taxi Data!!
+
+Finally append the below code snippet to the `init()`function. Here we are adding a ready event to the map so that this logic gets executed only after the map has been initialized.
+
+The snippet below does the following:
+
+1. The first step is to create a new [DataSource](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.source.datasource?view=azure-iot-typescript-latest) which will keep track of the taxi flight data within the map.
+
+2. Next, we create a new map [SymbolLayer](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.symbollayeroptions?view=azure-iot-typescript-latest) which describes how we want the flight data stored in the data source to be rendered on the map.
+
+3. Finally, add controls for the map which will enable you to zoom or change the theme of your map
+```javascript
+//Wait until the map resources are ready.
+map.events.add('ready', function () {
+    //Create a data source and add it to the map.
+    dataSource = new atlas.source.DataSource();
+    map.sources.add(dataSource);
+
+    //Create a symbol layer to render icons and/or text at points on the map.
+    // var symbolLayer = new atlas.layer.SymbolLayer(dataSource);
+
+    //Add a layer for rendering the route lines and have it render under the map labels.
+    map.layers.add(new atlas.layer.LineLayer(dataSource, null, {
+        strokeColor: '#2272B9',
+        strokeWidth: 5,
+        lineJoin: 'round',
+        lineCap: 'round'
+    }), 'labels');
+
+    map.controls.add([
+        new atlas.control.ZoomControl(),
+        new atlas.control.CompassControl(),
+        new atlas.control.PitchControl(),
+        new atlas.control.StyleControl()
+    ], {
+        position: "top-right"
+    });
+})
+```
+
+Refresh your browser... you should now see controls in the top right corner of your map. 
+
+---
 
 # Part 3 - Connect the Web App to Azure SignalR
-
-The first thing we need to here is add some logic to connect to SignalR from the client. To do this we will use the [ASP.NET Core SignalR JavaScript Client](https://docs.microsoft.com/en-us/aspnet/core/signalr/javascript-client?view=aspnetcore-2.2) library.
 
 - Add the following script snippet to your `index.html` file to add the **signalR.js** dependencies to your web app.
 
 ```html
-<script src="https://unpkg.com/@aspnet/signalr@1.0.2/dist/browser/signalr.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.7/signalr.min.js"></script>
 ```
-Next we need to add a couple of functions to initiate the connection with the SignalR service.
+Next we need to add some code in the `init()` function to initiate the connection with the SignalR service.
 
-1. First add a new function that will call the **SignalRConnectionInfo** endpoint that we created just before.
+1. First add a new function that will connect to the signalR hub. Replace the placeholder parameter with your Function App name. 
 
 ```javascript
-function GetConnectionInfo() {
-    return axios.get('http://localhost:7071/api/negotiate')
-        .then(function (response) {
-            return response.data
-        }).catch(console.error)
-}
+ const connection = new signalR.HubConnectionBuilder()
+                    .withUrl('https://<FUNCTION APP NAME>.azurewebsites.net/api')
+                    .withAutomaticReconnect()
+                    .build()
+
 ```
 
-2. Next add another function just below to initiate the connection with SignalR. If a connection is established, retry after a couple of seconds. Usually in a real world scenario, you'd use some back-off logic or circuit breaker pattern to better handle this scenario.
+2. Next, once the connection is initiated. We need to add code within the `init()` function to display the taxi data on the web app.
 
 ```javascript
-function StartConnection(connection) {
-    console.log('connecting...')
-    connection.start()
-        .then(function () { console.log('connected!') })
-        .catch(function (err) {
-            console.error(err)
-            setTimeout(function () { StartConnection(connection) }, 2000)})
-}
-```
+connection.on('notify', (msg) => {
+    const data = JSON.parse(msg)
+    const pre = document.getElementById('test')
+    for (const d of data) {
+        console.log(d)
 
-3. Now we need to do some refactoring of the Web App so that we can 'redraw' the planes on the map each time we get a new set of flight data.
+        //Create the GeoJSON objects which represent the start and end points of the route.
+        var startPoint = new atlas.data.Feature(new atlas.data.Point([d.pickupLon, d.pickupLat]), {
+            tripDistanceInMiles: d.tripDistanceInMiles,
+            passengerCount: d.passengerCount,
+            icon: "pin-round-blue"
+        });
 
-    - Remove the `GetFlightData()` method we created in Part 1 
-    - Create a new method called `ProcessFlightData(flight)` and add the logic contained in the code snippet below.
-    - Also create two local variables to store a reference to the maps **datasource** and a collection of all the current flight data.
+        var endPoint = new atlas.data.Feature(new atlas.data.Point([d.dropoffLon, d.dropoffLat]), {
+            tripDistanceInMiles: d.tripDistanceInMiles,
+            passengerCount: d.passengerCount,
+            icon: "pin-round-red"
+        });
 
-    ```javascript
-    let datasource;
-    let planes = [];
+        //Add the data to the data source.
+        dataSource.add([startPoint, endPoint]);
 
-    function ProcessFlightData(flight) {
-        console.log(flight);
+        // Use SubscriptionKeyCredential with a subscription key
+        var subscriptionKeyCredential = new atlas.service.SubscriptionKeyCredential(atlas.getSubscriptionKey());
 
-        var newFlightPin = new atlas.Shape(new atlas.data.Point([flight.longitute, flight.latitude]), flight.id);
-        newFlightPin.addProperty('name', flight.callsign);
-        newFlightPin.addProperty('altitude', flight.altitude);
-        newFlightPin.addProperty('rotation', flight.trueTrack);
+        // Use subscriptionKeyCredential to create a pipeline
+        var pipeline = atlas.service.MapsURL.newPipeline(subscriptionKeyCredential);
 
-        planes[flight.id] = newFlightPin;
-        datasource.setShapes(Object.values(planes));
+        // Construct the RouteURL object
+        var routeURL = new atlas.service.RouteURL(pipeline);
+
+        //Start and end point input to the routeURL
+        var coordinates = [[startPoint.geometry.coordinates[0], startPoint.geometry.coordinates[1]], [endPoint.geometry.coordinates[0], endPoint.geometry.coordinates[1]]];
+
+        //Make a search route request
+        routeURL.calculateRouteDirections(atlas.service.Aborter.timeout(10000), coordinates).then((directions) => {
+            //Get data features from response
+            var data = directions.geojson.getFeatures();
+            dataSource.add(data);
+        });
+
+        //Only show the most recent 16 taxi rides
+        if (dataSource.getShapes().length > 48) {
+            dataSource.remove(dataSource.getShapes().slice(0, 3));
+        }
+
     }
-    ```
+})
+connection.start();
+```
+
+3. Now that the connection is established, we need to add a symbol layer and some events to display useful information about the record. Add the following snippet also inside of the `init()` function 
+```javascript
+//Add a layer for rendering point data as symbols.
+symbolLayer = new atlas.layer.SymbolLayer(dataSource, null, { iconOptions: { allowOverlap: true } });
+map.layers.add(symbolLayer);
+
+//Create a popup but leave it closed so we can update it and display it later.
+popup = new atlas.Popup({
+    position: [0, 0],
+    pixelOffset: [0, -18]
+});
+
+//Close the popup when the mouse moves on the map.
+map.events.add('mousemove', closePopup);
+
+/**
+ * Open the popup on mouse move or touchstart on the symbol layer.
+ * Mouse move is used as mouseover only fires when the mouse initially goes over a symbol. 
+ * If two symbols overlap, moving the mouse from one to the other won't trigger the event for the new shape as the mouse is still over the layer.
+ */
+map.events.add('mousemove', symbolLayer, symbolHovered);
+map.events.add('touchstart', symbolLayer, symbolHovered);
+```
 
     The `ProcessFlightData(flight)` method will be called each time the SignalR connection receives an update from the **flightdata** hub. At which point we create a new **shape** for the map to reflect the new properties, add the shape to the collection of planes in local memory and update the maps **datasource** with the update plane collection values.
 
