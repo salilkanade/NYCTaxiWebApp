@@ -268,6 +268,7 @@ namespace HTTPTrigger
 
 }
 ```
+
 3. The final thing to do before we run this function is to add the connection string for the SignalR Service to the functions config.
 
     - Create a new setting property called `"AzureSignalRConnectionString"` and set the value to the connection string for your SignalR instance in Azure.
@@ -557,7 +558,7 @@ function symbolHovered(e) {
 - Finally, click on **Storage Explorer (preview)**. Under *Blob Containers*, there should be a `$web` in the dropdown. Click on that and verify that the `index.html` file listed is the correct one.
 
 #### Thats everything wired up!
-You should now be able to run your Azure Function App, open your web app in a browser and after a couple seconds, see your taxi data rendered on the map. Open up the console to view trace logs if you want to inspect the flight data objects. 
+You should now be able to run your Azure Function App, open your web app in a browser and after a couple seconds, see your taxi data rendered on the map. Open up the console to view trace logs if you want to inspect the taxi data objects. 
 
 
 Obviously this is only just scratching the surface of what we could do with this particular example or even with other use cases for real time serverless web apps using Azure Functions, Stream Analytics and SignalR. I hope you enjoyed this tutorial as much as I did putting it together.
