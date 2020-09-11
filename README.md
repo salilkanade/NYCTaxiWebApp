@@ -288,7 +288,7 @@ Run your Function App again and make a request to your **SignalRConnectionInfo**
   }
 ```
 
-With that done, we are now ready update the client app to connect to SignalR and start receiving real time updates to the flight data on the front end.
+With that done, we are now ready update the client app to connect to SignalR and start receiving real time updates to the taxi data on the front end.
 
 ---
 
