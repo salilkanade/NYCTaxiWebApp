@@ -1,14 +1,13 @@
-# Real-time Data Visualization w/ Azure Stream Analytics, Azure Functions, and SignalR
+# Real-time Data Visualization with Azure Stream Analytics, Azure Functions, SignalR and Azure Maps
 
 ## What we will cover
 
-In this tutorial, we will be visualizing data on a serverless web app utilizing several Azure technologies.
+In this tutorial, we will process and visualize data coming from NYC Taxi trips on a serverless web app utilizing several Azure technologies.
 
-- We will be using Azure Maps to draw the map canvas in our web app.
-- To get the flight information, we will create a Virtual Machine from the provisioned image. The taxi data will then be persisted in an Event Hub.
-- The Stream Analytics job will then process and query the data recieved from the Event Hub.
+- To get the NYC taxi data information, we will create a Virtual Machine from the provisioned image. This VM is using historical data from NYC taxi and will replay the events and send them to an Event Hub.
+- The Stream Analytics job will then process and transform the data received from the Event Hub in real-time.
 - We will then create an Azure Function that listens to the Stream Analytics job and updates an Azure SignalR hub with all changes to the taxi data. 
-- Finally the web app will be configured with a SignalR client to handle the data changes in real-time.
+- The web app will be configured with a SignalR client to handle the data changes in real-time and use Azure Maps to visualize the data
 
 For an introduction to the architecture, familiarize yourself with the picture below. 
 <img width="1000" alt="DemoArch" src="https://user-images.githubusercontent.com/68666863/92974360-de1dd900-f43a-11ea-88ec-01b6b62e5b96.PNG">
@@ -40,7 +39,7 @@ For an introduction to the architecture, familiarize yourself with the picture b
     | Pricing Tier      | Select **Standard S0** [See Pricing Info](https://azure.microsoft.com/en-us/pricing/details/azure-maps/)
 
 5. Read the **License and Privacy Statement** and select the checkbox.
-6. Once the new Azure Maps resource has been provision, navigate to the newly deployed resource and locate the **Authentication** tab under the **Settings** subheading. You will need to grab the key later on.
+6. Once the new Azure Maps resource has been provisioned, navigate to the newly deployed resource and locate the **Authentication** tab under the **Settings** subheading. You will need to grab the key later on.
 
 ---
 
@@ -126,7 +125,7 @@ For an introduction to the architecture, familiarize yourself with the picture b
 1. Head over to your Stream Analytics job that we created in the first step within the Azure portal.
 2. Click **Inputs** under the Job topology section.
 3. Next, click **Add Stream Input** and select **Event Hub**
-4. Name the input alias as **TaxiRide** and fill out the rest of the information to link up with the Event Hub created right before.
+4. Name the input alias as **TaxiRide** and fill out select the Event Hub you created right before in the drop down.
 5. Next, click **Save** and once the connection is successful, click **Outputs** under the Job topology section in the left-hand menu bar.
 6. In the **Ouputs** tab, click **Add** and select **Azure Function** from the dropdown menu.
 7. Name the output alias as **ASAFunction** and select the **Provide azure function settings manually**
@@ -135,9 +134,9 @@ For an introduction to the architecture, familiarize yourself with the picture b
 
 ---
 
-# Part 2 - Building Azure Functions to enable real time flight data
+# Part 2 - Building Azure Function
 
-In Part 2 of this tutorial, we will now focus on building out the Azure Functions which will enable real time data updates for the flight data on our map.
+In Part 2 of this tutorial, we will now focus on building out the Azure Functions which will enable real time data updates for the taxi data on our map.
 The following image describes the flow we are looking to create to enable real time functionality.
 
 1. A record or change is updated in the Event Hub. 
@@ -392,9 +391,9 @@ Finally append the below code snippet to the `init()`function. Here we are addin
 
 The snippet below does the following:
 
-1. The first step is to create a new [DataSource](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.source.datasource?view=azure-iot-typescript-latest) which will keep track of the taxi flight data within the map.
+1. The first step is to create a new [DataSource](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.source.datasource?view=azure-iot-typescript-latest) which will keep track of the taxi data within the map.
 
-2. Next, we create a new map [SymbolLayer](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.symbollayeroptions?view=azure-iot-typescript-latest) which describes how we want the flight data stored in the data source to be rendered on the map.
+2. Next, we create a new map [SymbolLayer](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.symbollayeroptions?view=azure-iot-typescript-latest) which describes how we want the taxi data stored in the data source to be rendered on the map.
 
 3. Finally, add controls for the map which will enable you to zoom or change the theme of your map
 ```javascript
