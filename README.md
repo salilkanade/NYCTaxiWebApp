@@ -11,7 +11,7 @@ In this tutorial, we will be visualizing data on a serverless web app utilizing 
 - Finally the web app will be configured with a SignalR client to handle the data changes in real-time.
 
 For an introduction to the architecture, familiarize yourself with the picture below. 
-<img width="1000" alt="DemoArch" src="https://user-images.githubusercontent.com/68666863/92974360-de1dd900-f43a-11ea-88ec-01b6b62e5b96.PNG">
+![DemoArch](https://docs.microsoft.com/en-us/azure/stream-analytics/media/stream-analytics-solution-patterns/dynamic-app.png)
 
 ## What you will need
 
@@ -27,7 +27,7 @@ For an introduction to the architecture, familiarize yourself with the picture b
 
 ### Create a new Azure Maps resource
 
-1. In the upper left corner of the portal, click on **Create a resource***
+1. In the upper left corner of the portal, click on **Create a resource**
 2. Type in **Maps** in the search bar and select **Maps** in the dropdown.
 3. Click the **Create** button that appears on the Maps resource page
 4. Enter the following information into the **Create Maps Account** template
@@ -50,7 +50,7 @@ For an introduction to the architecture, familiarize yourself with the picture b
 
 ### Create a new Azure SignalR resource
 
-1. In the upper left corner of the portal, click on **Create a resource***
+1. In the upper left corner of the portal, click on **Create a resource**
 2. Type in **SignalR** in the search bar and select **SignalR Service** in the dropdown.
 3. Click the **Create** button that appears on the SignalR Service resource page
 4. Enter the following information into the **Create SignalR Service** template
@@ -73,7 +73,7 @@ For an introduction to the architecture, familiarize yourself with the picture b
 
 ### Create a new Stream Analytics Job
 
-1. In the upper left corner of the portal, click on **Create a resource***
+1. In the upper left corner of the portal, click on **Create a resource**
 2. Type in **Stream** in the search bar and select **Stream Analytics Job** in the dropdown.
 3. Click the **Create** button that appears on the Stream Analytics job page
 4. Enter the following information into the **Create Stream Analytics Job** template
@@ -96,7 +96,7 @@ For an introduction to the architecture, familiarize yourself with the picture b
 
 ### Create a new Function App
 
-1. In the upper left corner of the portal, click on **Create a resource***
+1. In the upper left corner of the portal, click on **Create a resource**
 2. Type in **Function** in the search bar and select **Function App** in the dropdown.
 3. Click the **Create** button that appears on the Function App page
 4. Enter the following information into the **Create Function App** template
