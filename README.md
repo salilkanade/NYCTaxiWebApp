@@ -156,6 +156,7 @@ In order to use the Cosmos DB change feed to track changes to the flight data, w
 3. Make sure the code is editted to include your specific SignalR hub name. 
 
 ```CSharp
+
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -165,6 +166,31 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 
+public static class NegotiateFunction
+{
+    [FunctionName("negotiate")]
+    public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous)] HttpRequest req,
+                                    [SignalRConnectionInfo(HubName = "taxidata")] SignalRConnectionInfo info,
+                                    ILogger log)
+    {
+        return info != null
+            ? (ActionResult)new OkObjectResult(info)
+            : new NotFoundObjectResult("Failed to load SignalR Info.");
+    }
+}
+```
+
+To use the SignalR binding extensions you need to add the [Microsoft.Azure.WebJobs.Extensions.SignalRService](https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.SignalRService) package from nuget as a dependency to your project.
+
+4. Add an app setting to the **local.settings.json** file called `AzureSignalRConnectionString` and set the value to the connection string for SignalR service.
+
+The next thing to do is to create a mechanism to push the taxi data to our SignalR Service that we provisioned earlier. Lets cover that next.
+
+## SignalR Outbound Trigger
+
+In the same Azure Function, we will then use the [SignalR output binding](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-signalr-service#using-signalr-service-with-azure-functions) to push the updated flight data to SignalR. 
+
+```csharp
 namespace HTTPTrigger
 {   
     public static class MessageFunction
@@ -194,59 +220,8 @@ namespace HTTPTrigger
 }
 ```
 
-To use the SignalR binding extensions you need to add the [Microsoft.Azure.WebJobs.Extensions.SignalRService](https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.SignalRService) package from nuget as a dependency to your project.
-
-4. Add an app setting to the **local.settings.json** file called `AzureSignalRConnectionString` and set the value to the connection string for SignalR service.
-
-The next thing to do is to create a mechanism to push the taxi data to our SignalR Service that we provisioned earlier. Lets cover that next.
-
-## CosmosDB Change Feed & SignalR Outbound Trigger
-
-To listen for updates to our flight data data-set in CosmosDB we are going to leverage the [CosmosDB Change Feed](https://docs.microsoft.com/en-us/azure/cosmos-db/change-feed). The change feed works by listening for changes to your collection and outputs those changes in the same order they were add or modified. The output from the change feed can then be broadcast to any number of subscribers. We will use the [CosmosDB Trigger binding](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-cosmosdb-v2#trigger) to process the change feed updates in an Azure Function.
-
-In the same Azure Function, we will then use the [SignalR output binding](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-signalr-service#using-signalr-service-with-azure-functions) to push the updated flight data to SignalR. 
-
-
-1. In **Visual Studio 2017** right click on your Function App project and add a new Azure Function and give your function a meaningful name.
-
-2. Pick the **Cosmos DB Trigger** template from the menu and click OK.
+If you run your function app now, you should get both your negotiate and message functions spinning up at the same time. If everything is hooked up correctly you should see some log output to the console like below showing how many flights were added into the database and subsequently processed by the change feed.
     
-    | Name                      | Value |
-    | ---                       | ---   |
-    | Connection String Setting | Name of you CosmosDB connection string config property (AzureCosmosDBConnection)
-    | Database name             | Your CosmosDB flight data database name
-    | Collection name           | Your CosmosDB flight data collection name
-
-    ![FCF](Artifacts/FuncChangeFeed.png)
-
-3. You should now have a function that looks lik below. Notice the template has set the database and collection property names.
-
-4. Add one more property to the Cosmos DB Trigger binding called `CreateLeaseCollectionIfNotExists` and set this to `true` as below. This will create a new lease collection in your database, if one doesn't exist, which is where the change feed will keep a track of which records it has already processed.
-
-```csharp
-public static class FlightDataChangeFeed
-{
-    [FunctionName("FlightDataChangeFeed")]
-    public static void Run([CosmosDBTrigger(
-        databaseName: "flightsdb",
-        collectionName: "flights",
-        ConnectionStringSetting = "AzureCosmosDBConnection",
-        LeaseCollectionName = "leases",
-        CreateLeaseCollectionIfNotExists = true)]IReadOnlyList<Document> input, ILogger log)
-    {
-        if (input != null && input.Count > 0)
-        {
-            log.LogInformation("Documents modified " + input.Count);
-            log.LogInformation("First document Id " + input[0].Id);
-        }
-    }
-}
-```
-
-If you run your function app now, you should get both your timer triggered function and your change feed listener functions spinning up at the same time. If everything is hooked up correctly you should see some log output to the console like below showing how many flights were added into the database and subsequently processed by the change feed.
-    
-![FCFL](Artifacts/FuncChangeFeedLog.png)
-
 5. The next step to add the SignalR output binding. To use this binding you will need add the **Microsoft.Azure.WebJobs.Extensions.SignalRService** package dependency from nuget to your project.
 
 6. With the package installed add the binding to your function as per below, setting the **HubName** attribute to `flightdata`
