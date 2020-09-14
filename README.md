@@ -619,7 +619,8 @@ function symbolHovered(e) {
 }
 ```
 
-5. The final step now is to save your update `index.html` file. Once that has been completed, head over to your storage account in the Azure online portal. Your [index.html](https://github.com/salilkanade/NYCTaxiWebApp/blob/master/NYCTaxi/index.html) code should look similar to the page hyperlinked.  
+5. The final step now is to save your update `index.html` file. Your [index.html](https://github.com/salilkanade/NYCTaxiWebApp/blob/master/NYCTaxi/index.html) code should look similar to the page hyperlinked. 
+6. Once that has been completed, head over to your storage account in the Azure online portal. 
 
 - Click on **Static Website** on the side tab, and click **Enable**. 
 - Type in `index.html` into the **Index document name** 
