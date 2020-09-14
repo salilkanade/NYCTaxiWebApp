@@ -151,7 +151,7 @@ For an introduction to the architecture, familiarize yourself with the picture b
 2. On the left-hand menu bar, under *Entities*, select **Event Hubs**. 
 3. We will need to create two separate event hubs in the same namespace: *fare* and *input*.
 4. Click the **Add Event Hubs** and fill out the respective information.
-    - Both event hubs should have a partition count of *2* and message rentention of *3*, with the "Capture" turned off.
+    - Both event hubs should have a partition count of *2*, message retention of *3*, with the *Capture* turned off.
     - Click **Create** to deploy the event hub
 5. Once both Event hubs are created, we will need to create shared access policies to connect to them. 
     - Navigate to one of the event hubs, and in the left hand menu, select **Share access policies**.
