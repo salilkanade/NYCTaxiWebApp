@@ -303,7 +303,7 @@ Run your Function App again and make a request to your **SignalRConnectionInfo**
   }
 ```
 
-With that done, we are now ready update the client app to connect to SignalR and start receiving real time updates to the taxi data on the front end.
+With that done, we are now ready update our Stream Analytics jobs to complete the backend data flow. Once this is done, we can display the simulated "real-time" data in a serverless environment.
 
 ---
 
@@ -349,7 +349,8 @@ FROM RegionAgg
 
 11. Click **Save Query**
 12. Go back to the **Overview** page and start the Stream Analytics job
-12. Now once the job has started, when clicking the TaxiRide input in the Query page, the following data should show up in the input preview:
+12. Now once the job has started, click the **Metrics** page and make sure input and output events are being processed correctly. 
+14. Go back to the Query page, and click the TaxiRide input, the following data should show up in the input preview:
 
 <img width="966" alt="SampleInputData" src="https://user-images.githubusercontent.com/68666863/93040670-5f25cd80-f5ff-11ea-8e7f-067358037982.PNG"> 
 
