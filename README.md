@@ -607,7 +607,7 @@ map.events.add('touchstart', symbolLayer, symbolHovered);
 ```
 4. Next, we need to add create two functions for the popups on each pin to display the taxi ride information.
 
-```
+```javascript
 function closePopup() {
     popup.close();
 }
