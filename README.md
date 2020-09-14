@@ -346,6 +346,7 @@ SELECT *
 INTO ASAFunction
 FROM RegionAgg
 ```
+This query selects all the relevant fields to be outputted to the Azure Functions to be later parsed. The query also verifies that the taxi rides are within reasonable bounds of the map. 
 
 11. Click **Save Query**
 12. Go back to the **Overview** page and start the Stream Analytics job
