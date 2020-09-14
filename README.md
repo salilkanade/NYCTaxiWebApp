@@ -14,7 +14,7 @@ For an introduction to the architecture, familiarize yourself with the picture b
 
 ## What you will need
 
-- Microsoft Azure Account [**create a free account**](https://azure.microsoft.com/en-us/free/)
+- [Microsoft Azure Account](https://azure.microsoft.com/en-us/free/)
 - Visual Studio Code
     - Install the *Azure Functions*, *Azure Account*, *Azure Serverless*, *C#*, *Live Server*, *Azure App Service* extensions
 - Azure Function CLI Tools *(Will be downloaded automatically when debugging functions locally)*
