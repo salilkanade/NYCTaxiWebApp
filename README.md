@@ -585,7 +585,7 @@ connection.start();
 
 ```javascript
 //Add a layer for rendering point data as symbols.
-symbolLayer = new atlas.layer.SymbolLayer(dataSource, null, { iconOptions: { allowOverlap: true } });
+symbolLayer = new atlas.layer.SymbolLayer(dataSource, null, { iconOptions: {image: ['get', 'icon']} , allowOverlap: true } );
 map.layers.add(symbolLayer);
 
 //Create a popup but leave it closed so we can update it and display it later.
