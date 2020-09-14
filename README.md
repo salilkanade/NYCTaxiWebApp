@@ -504,7 +504,7 @@ In Part 4, we will now be adding some code to make the map interactive and funct
 ```html
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.7/signalr.min.js"></script>
 ```
-Next we need to add some code in the `init()` function to initiate the connection with the SignalR service.
+Next, we need to add some code in the `init()` function to initiate the connection with the SignalR service.
 
 1. First add a new function that will connect to the signalR hub. Replace the placeholder parameter with your Function App name. 
 
