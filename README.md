@@ -518,7 +518,8 @@ Next, we need to add some code in the `init()` function to initiate the connecti
 ```
 
 2. Next, once the connection is initiated. We need to add code within the `init()` function to display the taxi data on the web app.
-
+    - In this part of the code, we are parsing the data to read certain relevant information that we want displayed on the map (like the lat & long, trip distance, and passenger count, etc.)
+    - From the lat and long coordinates from the data, we then create routes that are calculated from by the Azure Maps API. 
 ```javascript
 connection.on('notify', (msg) => {
     const data = JSON.parse(msg)
@@ -629,7 +630,6 @@ function symbolHovered(e) {
 
 #### That's everything wired up!
 You should now be able to run your Azure Function App, open your web app in a browser and after a couple seconds, see your taxi data rendered on the map. Open up the console to view trace logs if you want to inspect the taxi data objects. 
-
 
 Obviously this is only just scratching the surface of what we could do with this particular example or even with other use cases for real time serverless web apps using Stream Analytics, Azure Functions, and SignalR. I hope you enjoyed this tutorial as much as I did putting it together.
 
