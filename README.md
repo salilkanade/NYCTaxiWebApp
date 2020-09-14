@@ -567,7 +567,7 @@ connection.on('notify', (msg) => {
 connection.start();
 ```
 
-3. Now that the connection is established, we need to add a symbol layer and some events to display useful information about the record. Add the following snippet also inside of the `init()` function.
+3. Now that the connection is established, we need to add a [SymbolLayber](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.symbollayeroptions?view=azure-maps-typescript-latest&viewFallbackFrom=azure-iot-typescript-latest) and some events to display useful information about the record. Add the following snippet also inside of the `init()` function.
 
 ```javascript
 //Add a layer for rendering point data as symbols.
