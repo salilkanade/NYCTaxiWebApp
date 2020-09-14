@@ -303,6 +303,8 @@ Run your Function App again and make a request to your **SignalRConnectionInfo**
   }
 ```
 
+Now that your functions are completed, it is important to deploy the code to your function app. With the Azure Functions extension previously installed for the Visual Studio code, click the upwards facing arrow to **Deploy the Resource to the Function App**. Locate the correct subscription and function app and select the correct Function App in the dropdown menu.  
+
 With that done, we are now ready update our Stream Analytics jobs to complete the backend data flow. Once this is done, we can display the simulated "real-time" data in a serverless environment.
 
 ---
@@ -620,8 +622,10 @@ function symbolHovered(e) {
 6. Once that has been completed, head over to your storage account in the Azure online portal. 
 
 - Click on **Static Website** on the side tab, and click **Enable**. 
-- Type in `index.html` into the **Index document name** 
+    - *The link to your serverless web app is in the query box under the **Primary endpoint** label.
+- Type in `index.html` into the **Index document name**. 
 - Finally, click on **Storage Explorer (preview)**. Under *Blob Containers*, there should be a `$web` in the dropdown. Click on that and verify that the `index.html` file listed is the correct one.
+
 
 #### That's everything wired up!
 You should now be able to run your Azure Function App, open your web app in a browser and after a couple seconds, see your taxi data rendered on the map. Open up the console to view trace logs if you want to inspect the taxi data objects. 
