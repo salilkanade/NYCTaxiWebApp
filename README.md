@@ -618,7 +618,7 @@ function symbolHovered(e) {
 }
 ```
 
-5. The final step now is to save your update `index.html` file. Once that has been completed, head over to your storage account in the Azure online portal. 
+5. The final step now is to save your update `index.html` file. Once that has been completed, head over to your storage account in the Azure online portal. Your [index.html](https://github.com/salilkanade/NYCTaxiWebApp/blob/master/NYCTaxi/index.html) code should look similar to code attached.  
 
 - Click on **Static Website** on the side tab, and click **Enable**. 
 - Type in `index.html` into the **Index document name** 
@@ -628,6 +628,6 @@ function symbolHovered(e) {
 You should now be able to run your Azure Function App, open your web app in a browser and after a couple seconds, see your taxi data rendered on the map. Open up the console to view trace logs if you want to inspect the taxi data objects. 
 
 
-Obviously this is only just scratching the surface of what we could do with this particular example or even with other use cases for real time serverless web apps using Azure Functions, Stream Analytics and SignalR. I hope you enjoyed this tutorial as much as I did putting it together.
+Obviously this is only just scratching the surface of what we could do with this particular example or even with other use cases for real time serverless web apps using Stream Analytics, Azure Functions, and SignalR. I hope you enjoyed this tutorial as much as I did putting it together.
 
 Thank You!
