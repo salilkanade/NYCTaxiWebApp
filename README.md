@@ -325,7 +325,7 @@ Streaming Analytics job consists of an input, query, and an output. This Stream 
 1. Head over to your Stream Analytics job that we created in the first step within the Azure portal.
 2. Click **Inputs** under the Job topology section.
 3. Next, click **Add Stream Input** and select **Event Hub**.
-4. Name the input alias as **TaxiRide** and fill out select the Event Hub you created right before in the drop down.
+4. Name the input alias as **TaxiRide**. Select the 'input' Event Hub and its respective policy name that you created right before in the drop down menu from the correct subscription.
 5. Next, click **Save** and once the connection is successful, click **Outputs** under the Job topology section in the left-hand menu bar.
 6. In the **Ouputs** tab, click **Add** and select **Azure Function** from the dropdown menu.
 7. Name the output alias as **ASAFunction** and select the **Provide azure function settings manually**.
