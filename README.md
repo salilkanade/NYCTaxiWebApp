@@ -347,16 +347,10 @@ TripData AS (
     FROM TaxiRide timestamp by pickupTime
     WHERE pickupLat > -90 AND pickupLat < 90 AND pickupLon > -180 AND pickupLon < 180
 ),
-RegionAgg AS (
-SELECT RegionReferenceData.Name AS countyName, system.timestamp as timestamps, TripData.pickupLat, TripData.pickupLon, TripData.pickupTime, TripData.VendorID, TripData.tripDistanceInMiles, TripData.dropoffLon, TripData.dropoffLat, TripData.passengerCount, TripData.TripTimeinSeconds
-FROM TripData
-JOIN RegionReferenceData ON 
-ST_WITHIN(CreatePoint(TripData.pickupLat, TripData.pickupLon), RegionReferenceData.geometry) = 1
-)
 
 SELECT *
 INTO ASAFunction
-FROM RegionAgg
+FROM TripData
 ```
 This query selects all the relevant fields to be outputted to the Azure Functions to be later parsed. The query also verifies that the taxi rides are within reasonable bounds of the map. 
 
