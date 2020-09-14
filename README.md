@@ -10,7 +10,8 @@ In this tutorial, we will process and visualize data coming from NYC Taxi trips 
 - The web app will be configured with a SignalR client to handle the data changes in real-time and use Azure Maps to visualize the data
 
 For an introduction to the architecture, familiarize yourself with the picture below. 
-<img width="1000" alt="DemoArch" src="https://user-images.githubusercontent.com/68666863/92974360-de1dd900-f43a-11ea-88ec-01b6b62e5b96.PNG">
+<img width="1000" alt="DemoArch" src="https://user-images.githubusercontent.com/68666863/93050829-673e3700-f618-11ea-8d22-a0758f59f697.PNG">
+
 
 ## What you will need
 
