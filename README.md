@@ -14,8 +14,9 @@ For an introduction to the architecture, familiarize yourself with the picture b
 
 ## What you will need
 
-- Microsoft Azure Account
+- Microsoft Azure Account [**create a free account**](https://azure.microsoft.com/en-us/free/)
 - Visual Studio Code
+    - Install the *Azure Functions*, *Azure Account*, *Azure Serverless*, *C#*, *Live Server*, *Azure App Service* extensions
 - Azure Function CLI Tools *(Will be downloaded automatically when debugging functions locally)*
 
 # Creating the Azure Resources
@@ -115,22 +116,36 @@ For an introduction to the architecture, familiarize yourself with the picture b
 
 ---
 
-# Part 1 - Creating the Virtual Machine, Event Hub, and Stream Analytics job for data ingestion
+## Azure Event Hubs
+
+[**Azure Event Hubs from the docs**](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-about)
+
+### Create a new Event Hub namespace
+
+1. In the upper left corner of the portal, click on **Create a resource**
+2. Type in **Event Hubs** in the search bar and select **Event Hubs** in the dropdown.
+3. Click the **Create** button that appears on the Event Hubs page.
+4. Enter the following information into the **Create Namespace** template
+
+    | Name              | Value |
+    | ---               | ---   |
+    | Subscription      | Select your subscription
+    | Resource Group    | Select the resource group created above
+    | Namespace name    | Give your event hub namespace app a meaningful name
+    | Location          | Select a location to deploy your event hub namespace too
+    | Pricing tier      | Select **Standard or Basic** from the dropdown menu
+    | Throughput Units  | Leave it at 3
+   
+5. Click **Review + Create** and then once the validation has passed, select **Create**
+
+---
+
+# Part 1 - Creating the Virtual Machine and Event Hubs
 
 ## Create the VM from the provisioned image
 
 ## Set up the Event Hub to gather records from the Virtual Machine
 
-## Set up the Stream Analytics job to query and process the data
-1. Head over to your Stream Analytics job that we created in the first step within the Azure portal.
-2. Click **Inputs** under the Job topology section.
-3. Next, click **Add Stream Input** and select **Event Hub**
-4. Name the input alias as **TaxiRide** and fill out select the Event Hub you created right before in the drop down.
-5. Next, click **Save** and once the connection is successful, click **Outputs** under the Job topology section in the left-hand menu bar.
-6. In the **Ouputs** tab, click **Add** and select **Azure Function** from the dropdown menu.
-7. Name the output alias as **ASAFunction** and select the **Provide azure function settings manually**
-8. Provide the correct subscription where the function app was created, and provide the correct function app name.
-9. Under the **Function** query box, type **message** and provide the appropriate key from the Function App. 
 
 ---
 
@@ -292,9 +307,59 @@ With that done, we are now ready update the client app to connect to SignalR and
 
 ---
 
-# Part 3 - Creating a static Web App
+# Part 3 - Setting Up the Stream Analytics Job
 
-The web app we are going to build displays the "real-time" data on an Azure Map interface. In Part 3 of this tutorial, we will be setting up the map so that the data can be  displayed. 
+Streaming Analytics job consists of an input, query, and an output. This Stream Analytics job injests the data from the Azure Event Hubs and the query (which is SQL based) can be used to easily filter, sort, and join streaming data to output to our Azure Functions. 
+
+## Set up the Stream Analytics job to query and process the data
+1. Head over to your Stream Analytics job that we created in the first step within the Azure portal.
+2. Click **Inputs** under the Job topology section.
+3. Next, click **Add Stream Input** and select **Event Hub**
+4. Name the input alias as **TaxiRide** and fill out select the Event Hub you created right before in the drop down.
+5. Next, click **Save** and once the connection is successful, click **Outputs** under the Job topology section in the left-hand menu bar.
+6. In the **Ouputs** tab, click **Add** and select **Azure Function** from the dropdown menu.
+7. Name the output alias as **ASAFunction** and select the **Provide azure function settings manually**
+8. Provide the correct subscription where the function app was created, and provide the correct function app name.
+9. Under the **Function** query box, type **message** and provide the appropriate key from the Function App. 
+10. Next, click **Query** and copy and paste the following code for the SQL Query:
+
+```SQL
+--SELECT all relevant fields from TaxiRide Streaming input
+WITH 
+TripData AS (
+    SELECT TRY_CAST(pickupLat AS float) as pickupLat,
+    TRY_CAST(pickupLon AS float) as pickupLon,
+    TRY_CAST(dropoffLon AS float) as dropoffLon,
+    TRY_CAST(dropoffLat AS float) as dropoffLat,
+    TRY_CAST(passengerCount as float) as passengerCount, TripTimeinSeconds, pickupTime, VendorID, tripDistanceInMiles
+    FROM TaxiRide timestamp by pickupTime
+    WHERE pickupLat > -90 AND pickupLat < 90 AND pickupLon > -180 AND pickupLon < 180
+),
+RegionAgg AS (
+SELECT RegionReferenceData.Name AS countyName, system.timestamp as timestamps, TripData.pickupLat, TripData.pickupLon, TripData.pickupTime, TripData.VendorID, TripData.tripDistanceInMiles, TripData.dropoffLon, TripData.dropoffLat, TripData.passengerCount, TripData.TripTimeinSeconds
+FROM TripData
+JOIN RegionReferenceData ON 
+ST_WITHIN(CreatePoint(TripData.pickupLat, TripData.pickupLon), RegionReferenceData.geometry) = 1
+)
+
+SELECT *
+INTO ASAFunction
+FROM RegionAgg
+```
+
+11. Click **Save Query**
+12. Go back to the **Overview** page and start the Stream Analytics job
+12. Now once the job has started, when clicking the TaxiRide input in the Query page, the following data should show up in the input preview:
+
+<img width="966" alt="SampleInputData" src="https://user-images.githubusercontent.com/68666863/93040670-5f25cd80-f5ff-11ea-8e7f-067358037982.PNG"> 
+
+If the input preview shows sample data similar to this, we are ready to start developing the front end so that our data can be displayed.
+
+---
+
+# Part 4 - Creating a static Web App
+
+The web app we are going to build displays the "real-time" data on an Azure Map interface. In Part 4 of this tutorial, we will be setting up the map so that the data can be  displayed. 
 
 ## Create a new Map
 
