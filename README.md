@@ -528,7 +528,7 @@ Next, we need to add some code in the `init()` function to initiate the connecti
 
 2. Next, once the connection is initiated. We need to add code within the `init()` function to display the taxi data on the web app.
     - In this part of the code, we are parsing the data to read certain relevant information that we want displayed on the map (like the lat & long, trip distance, and passenger count, etc.)
-    - From the lat and long coordinates from the data, we then create routes that are calculated from by the Azure Maps SDK. 
+    - From the lat and long coordinates from the data, we then create routes that are calculated from by the [Azure Maps SDK](https://azuremapscodesamples.azurewebsites.net/). 
 ```javascript
 connection.on('notify', (msg) => {
     const data = JSON.parse(msg)
