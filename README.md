@@ -237,9 +237,7 @@ namespace HTTPTrigger
 If you run your function app now, you should get both your negotiate and message functions spinning up at the same time. If everything is hooked up correctly you should see some log output to the console like below showing how many taxi records were added into the database and subsequently processed by the change feed.
     
 1. The next step to add the SignalR output binding. To use this binding you will need add the **Microsoft.Azure.WebJobs.Extensions.SignalRService** package dependency from nuget to your project.
-
 2. With the package installed add the binding to your function as per below, setting the **HubName** attribute to your specific SignalR hub name.
-
     - The **Target** property is the name of the function to be invoked on the client and the **Arguments** property is the array of objects to be passed to the client.
 
 Your function should now be complete and resemble the logic below.
@@ -288,7 +286,6 @@ namespace HTTPTrigger
 ```
 
 3. The final thing to do before we run this function is to add the connection string for the SignalR Service to the functions config.
-
     - Create a new setting property called `"AzureSignalRConnectionString"` and set the value to the connection string for your SignalR instance in Azure.
 
 Once thats done, your functions are all set to go. Let's spin these functions up once again and test out the changes. With the functions running, head on over back the SignalR service in Azure and have a look at the metrics tab. After a couple of minutes you should see some telemetry start to feed through. It can take up to 10-15 minutes before you see data coming through on the metrics blade.
@@ -317,11 +314,11 @@ Streaming Analytics job consists of an input, query, and an output. This Stream 
 ## Set up the Stream Analytics job to query and process the data
 1. Head over to your Stream Analytics job that we created in the first step within the Azure portal.
 2. Click **Inputs** under the Job topology section.
-3. Next, click **Add Stream Input** and select **Event Hub**
+3. Next, click **Add Stream Input** and select **Event Hub**.
 4. Name the input alias as **TaxiRide** and fill out select the Event Hub you created right before in the drop down.
 5. Next, click **Save** and once the connection is successful, click **Outputs** under the Job topology section in the left-hand menu bar.
 6. In the **Ouputs** tab, click **Add** and select **Azure Function** from the dropdown menu.
-7. Name the output alias as **ASAFunction** and select the **Provide azure function settings manually**
+7. Name the output alias as **ASAFunction** and select the **Provide azure function settings manually**.
 8. Provide the correct subscription where the function app was created, and provide the correct function app name.
 9. Under the **Function** query box, type **message** and provide the appropriate key from the Function App. 
 10. Next, click **Query** and copy and paste the following code for the SQL Query:
