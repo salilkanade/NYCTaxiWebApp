@@ -460,18 +460,13 @@ The snippet below does the following:
 
 1. The first step is to create a new [DataSource](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.source.datasource?view=azure-iot-typescript-latest) which will keep track of the taxi data within the map.
 
-2. Next, we create a new map [SymbolLayer](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.symbollayeroptions?view=azure-iot-typescript-latest) which describes how we want the taxi data stored in the data source to be rendered on the map.
-
-3. Finally, add controls for the map which will enable you to zoom or change the theme of your map
+2. Next, add controls for the map which will enable you to zoom or change the theme of your map
 ```javascript
 //Wait until the map resources are ready.
 map.events.add('ready', function () {
     //Create a data source and add it to the map.
     dataSource = new atlas.source.DataSource();
     map.sources.add(dataSource);
-
-    //Create a symbol layer to render icons and/or text at points on the map.
-    // var symbolLayer = new atlas.layer.SymbolLayer(dataSource);
 
     //Add a layer for rendering the route lines and have it render under the map labels.
     map.layers.add(new atlas.layer.LineLayer(dataSource, null, {
