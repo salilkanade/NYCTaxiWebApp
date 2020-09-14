@@ -637,7 +637,8 @@ function symbolHovered(e) {
 #### That's everything wired up!
 You should now be able to run your Azure Function App, open your web app in a browser and after a couple seconds, see your taxi data rendered on the map. Open up the console to view trace logs if you want to inspect the taxi data objects. 
 
-<div style="width:324px;max-width:100%;"><div style="height:0;padding-bottom:50.93%;position:relative;"><iframe width="324" height="165" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameBorder="0" src="https://imgflip.com/embed/4eyqg3"></iframe></div><p><a href="https://imgflip.com/gif/4eyqg3"></a></p></div>
+![GIF](https://user-images.githubusercontent.com/68666863/93139754-2edd3e00-f696-11ea-97d8-4bbaf4b9f23f.gif)
+
 
 Obviously this is only just scratching the surface of what we could do with this particular example or even with other use cases for real time serverless web apps using Stream Analytics, Azure Functions, and SignalR. I hope you enjoyed this tutorial as much as I did putting it together.
 
