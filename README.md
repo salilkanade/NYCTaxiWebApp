@@ -35,7 +35,7 @@ For an introduction to the architecture, familiarize yourself with the picture b
     | Name              | Value |
     | ---               | ---   |
     | Subscription      | Select your subscription
-    | Resource Group    | Select the resource group created above
+    | Resource Group    | Click *Create new* and give your resource group a meaningful name
     | Name              | Give your maps account a meaningful name
     | Pricing Tier      | Select **Standard S0** [See Pricing Info](https://azure.microsoft.com/en-us/pricing/details/azure-maps/)
 
