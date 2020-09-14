@@ -491,9 +491,9 @@ Refresh your browser... you should now see controls in the top right corner of y
 
 ---
 
-# Part 4 - Connect the Web App to Azure SignalR
+# Part 5 - Connect the Web App to Azure SignalR
 
-In Part 4, we will now be adding some code to make the map interactive and functional.
+In our final section, we will now be adding some code to make the map interactive and functional.
 
 - Add the following script snippet to your `index.html` file to add the **signalR.js** dependencies to your web app.
 
