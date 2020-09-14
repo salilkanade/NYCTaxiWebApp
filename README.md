@@ -462,7 +462,7 @@ You might need to tweak the **center coordinates** and **zoom** settings to get 
 - [Supported Styles](https://docs.microsoft.com/en-us/azure/azure-maps/supported-map-styles)
 - [Map Control Docs](https://docs.microsoft.com/en-us/javascript/api/azure-maps-control/atlas.map?view=azure-iot-typescript-latest)
 
-## Lets Add Some Taxi Data!!
+## Lets Add Some Map Controls!!
 
 Finally append the below code snippet to the `init()`function. Here we are adding a ready event to the map so that this logic gets executed only after the map has been initialized.
 
