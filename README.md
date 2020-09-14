@@ -157,6 +157,8 @@ For an introduction to the architecture, familiarize yourself with the picture b
     - Navigate to one of the event hubs, and in the left hand menu, select **Share access policies**.
     - Click **add**, name the policy, and select the **Manage** checkbox.
     - Click **Create** and repeat with the other event hub.
+    
+Your event hubs should now be ready to feed data into the Stream Analytics job, which will then process and output the data to the Azure Functions. 
 
 ---
 
