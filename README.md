@@ -626,6 +626,7 @@ function symbolHovered(e) {
     - *The link to your serverless web app is in the query box under the **Primary endpoint** label.
 - Type in `index.html` into the **Index document name**. 
 - Finally, click on **Storage Explorer (preview)**. Under *Blob Containers*, there should be a `$web` in the dropdown. Click on that and verify that the `index.html` file listed is the correct one.
+    - If not, upload the correct `index.html` file and delete the existing one.
 
 
 #### That's everything wired up!
