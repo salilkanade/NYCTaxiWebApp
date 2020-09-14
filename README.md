@@ -459,6 +459,8 @@ zoom: 12
 
 Refresh the page in your browser and notice, the map is now zoomed in on New York.
 
+<img width="959" alt="BasicMap" src="https://user-images.githubusercontent.com/68666863/93118011-76eb6900-f674-11ea-820e-c7a5f8df8b12.PNG">
+
 You might need to tweak the **center coordinates** and **zoom** settings to get a better fit for your screen size and if you are after different styles or other custom configurations, take a look at the **Map** component section of the docs.
 
 - [Supported Styles](https://docs.microsoft.com/en-us/azure/azure-maps/supported-map-styles)
