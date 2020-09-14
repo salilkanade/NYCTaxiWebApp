@@ -202,7 +202,7 @@ The next thing to do is to create a mechanism to push the taxi data to our Signa
 
 ## SignalR Outbound Trigger
 
-In the same Azure Function namespace, we will then use the [SignalR output binding](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-signalr-service#using-signalr-service-with-azure-functions) to push the updated flight data to SignalR. 
+In the same Azure Function namespace, we will then use the [SignalR output binding](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-signalr-service#using-signalr-service-with-azure-functions) to push the updated taxi data to SignalR. 
 
 ```csharp
 namespace HTTPTrigger
@@ -234,7 +234,7 @@ namespace HTTPTrigger
 }
 ```
 
-If you run your function app now, you should get both your negotiate and message functions spinning up at the same time. If everything is hooked up correctly you should see some log output to the console like below showing how many flights were added into the database and subsequently processed by the change feed.
+If you run your function app now, you should get both your negotiate and message functions spinning up at the same time. If everything is hooked up correctly you should see some log output to the console like below showing how many taxi records were added into the database and subsequently processed by the change feed.
     
 1. The next step to add the SignalR output binding. To use this binding you will need add the **Microsoft.Azure.WebJobs.Extensions.SignalRService** package dependency from nuget to your project.
 
