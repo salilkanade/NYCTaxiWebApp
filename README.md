@@ -143,8 +143,6 @@ For an introduction to the architecture, familiarize yourself with the picture b
 
 # Part 1 - Creating the Virtual Machine and Event Hubs
 
-## Create the VM from the provisioned image
-
 ## Set up the Event Hub to gather records from the Virtual Machine
 
 1. Navigate to the Event hub namespace that was previously created. 
@@ -158,6 +156,63 @@ For an introduction to the architecture, familiarize yourself with the picture b
     - Click **add**, name the policy, and select the **Manage** checkbox.
     - Click **Create** and repeat with the other event hub.
     
+## Creating the Virtual Machine
+
+### Prerequisites
+1. Clone, fork, or download the zip file for this [repository](https://github.com/sidramadoss/reference-architectures).
+2. Install [Azure CLI 2.0](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest).
+3. Install the [Azure building blocks](https://github.com/mspnp/template-building-blocks/wiki/Install-Azure-Building-Blocks) npm package.
+   ```bash
+   npm install -g @mspnp/azure-building-blocks
+   ```
+4. From a command prompt, bash prompt, or PowerShell prompt, sign into your Azure account as follows:
+   ```bash
+   az login
+   ```
+
+### Download the source data files
+1. Create a directory named `DataFile` under the `data/streaming_asa` directory in the GitHub repo.
+2. Open a web browser and navigate to https://uofi.app.box.com/v/NYCtaxidata/folder/2332219935.
+3. Click the **Download** button on this page to download a zip file of all the taxi data for that year.
+4. Extract the zip file to the `DataFile` directory.
+    > This zip file contains other zip files. Don't extract the child zip files.
+The directory structure should look like the following:
+```
+/data
+    /streaming_asa
+        /DataFile
+            /FOIL2013
+                trip_data_1.zip
+                trip_data_2.zip
+                trip_data_3.zip
+                ...
+```
+### Run the data generator
+
+1. Get the Event Hub connection strings. You can get these from the Azure portal
+2. Navigate to the directory `data/streaming_asa/onprem` in the repository
+3. Update the values in the file `main.env` as follows:
+    ```
+    RIDE_EVENT_HUB=[Connection string for taxi-ride event hub]
+    FARE_EVENT_HUB=[Connection string for taxi-fare event hub]
+    RIDE_DATA_FILE_PATH=/DataFile/FOIL2013
+    MINUTES_TO_LEAD=0
+    PUSH_RIDE_DATA_FIRST=false
+    ```
+    Note that FARE EVENT HUB is still required by the simulator though it isn't used by the query.
+4. Run the following command to build the Docker image.
+    ```bash
+    docker build --no-cache -t dataloader .
+    ```
+5. Navigate back to the parent directory, `data/stream_asa`.
+    ```bash
+    cd ..
+    ```
+6. Run the following command to run the Docker image.
+    ```bash
+    docker run -v `pwd`/DataFile:/DataFile --env-file=onprem/main.env dataloader:latest
+    ```
+After running the last command, the taxi rides will be replayed and the data will be stored into the Event hub created just above.
 Your event hubs should now be ready to feed data into the Stream Analytics job, which will then process and output the data to the Azure Functions. 
 
 ---
