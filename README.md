@@ -212,7 +212,7 @@ The directory structure should look like the following:
     ```bash
     docker run -v `pwd`/DataFile:/DataFile --env-file=onprem/main.env dataloader:latest
     ```
-After running the last command, the taxi rides will be replayed and the data will be stored into the Event hub created just above.
+After running the last command, the taxi rides will be replayed and the data will be sent to  the Event hub created just above.
 Your event hubs should now be ready to feed data into the Stream Analytics job, which will then process and output the data to the Azure Functions. 
 
 ---
